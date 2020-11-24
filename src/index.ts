@@ -1,4 +1,4 @@
-import  Job  from './job/job'
 import getApi from './setup/getApi'
 
-export  {Job, getApi}
+export  * as Job  from './job/job'
+export {getApi}

@@ -1,5 +1,5 @@
 import { ApiBase } from '@polkadot/api/base';
-import {getApi} from '../src/index';
+import { getApi } from '../src/index';
 
 describe('do something', async () => {
 	let api: any
