@@ -1,0 +1,22 @@
+{
+  "name": "hmt_library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "halva-cli test",
+    "compile": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.1.2",
+    "halva-cli": "^0.3.3"
+  },
+  "dependencies": {
+    "@polkadot/api": "^2.8.1",
+    "@polkadot/keyring": "^4.2.1",
+    "@polkadot/types": "^2.8.1"
+  }
+}
