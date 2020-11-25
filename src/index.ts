@@ -1,4 +1,4 @@
 import getApi from './utils/getApi'
+import {JobReads, Job} from './job'
 
-export  * as Job  from './job/job'
-export { getApi }
+export { getApi, JobReads, Job }

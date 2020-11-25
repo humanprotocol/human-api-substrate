@@ -17,3 +17,5 @@ export type EscrowManifest = any;
 export type Account = any;
 
 export type Decimals = Number;
+
+export type Results = any;
