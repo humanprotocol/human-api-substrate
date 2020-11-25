@@ -1,6 +1,5 @@
-import { EscrowId, Status, ManifestUrl, ManifestHash, PrivateKey } from '../types/index'
+import { EscrowId, Status, ManifestUrl, ManifestHash, Address } from '../types/index'
 import { ApiPromise } from '@polkadot/api'
-import { Keyring } from '@polkadot/keyring'
 /**
  * 
  * @param escrowId the id of the escrow to be queried 
@@ -18,7 +17,7 @@ export const status = async (api: ApiPromise, escrowId: EscrowId): Promise<Statu
  * @return Manifest Url of the escrow instance
  * @dev Retrieves the deployed manifest url uploaded on Job initialization
  */
-export const manifest_url = async (api: ApiPromise, escrowId: EscrowId): Promise<ManifestUrl> => {
+export const manifestUrl = async (api: ApiPromise, escrowId: EscrowId): Promise<ManifestUrl> => {
 	return "temp"
 }
 
@@ -28,7 +27,7 @@ export const manifest_url = async (api: ApiPromise, escrowId: EscrowId): Promise
  * @return Manifest Hash of the escrow instance
  * @dev Retrieves the deployed manifest url uploaded on Job initialization
  */
-export const manifest_hash = async (api: ApiPromise, escrowId: EscrowId): Promise<ManifestHash> => {
+export const manifestHash = async (api: ApiPromise, escrowId: EscrowId): Promise<ManifestHash> => {
 	return "temp"
 }
 
@@ -39,16 +38,6 @@ export const manifest_hash = async (api: ApiPromise, escrowId: EscrowId): Promis
  * @return Boolean
  * @dev Retrieves if the address is a trusted handler from the escrow instance
  */
-export const is_trusted_handler = async (api: ApiPromise, escrowId: EscrowId, address: String): Promise<Boolean> => {
+export const isTrustedHandler = async (api: ApiPromise, escrowId: EscrowId, address: Address): Promise<Boolean> => {
 	return true
-}
-
-/**
- * @param gas_payer Private key of contract launcher
- * @return address of Private Key
- * @dev Retrieves the address of the account that launched the contract
- */
-export const privateKeyToAddress = (gas_payer: PrivateKey): String => {
-	const keyring = new Keyring({ type: 'sr25519', ss58Format: 2 });
-	return keyring.addFromSeed(gas_payer).address
 }
