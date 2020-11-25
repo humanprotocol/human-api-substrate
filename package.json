@@ -11,11 +11,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^4.1.2",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.4",
     "mocha": "^8.2.1",
-    "ts-mocha": "^8.0.0"
+    "ts-mocha": "^8.0.0",
+    "typescript": "^4.1.2"
   },
   "dependencies": {
     "@polkadot/api": "^2.8.1",
