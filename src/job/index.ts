@@ -1,7 +1,6 @@
 import { ApiPromise, Keyring } from '@polkadot/api'
 import { Credentials, Payouts } from '../interfaces'
-import { EscrowId, Address, PublicKey, Results } from '../types'
-import { manifestHash, manifestUrl } from '../utils/escrowGetters';
+import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 
 function signAndSend(call, api, sender) {
 	return call.signAndSend(sender, ({ status, events, dispatchError }) => {
@@ -34,6 +33,87 @@ export class JobReads {
 	constructor (api: ApiPromise, escrowId: EscrowId) {
 		this.api = api
 		this.escrowId = escrowId
+	}
+
+	/**
+	 * 
+	 * @return Status of the Escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization.
+
+	*/
+	async status(): Promise<Status>  {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Url of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestUrl(): Promise<ManifestUrl> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Hash of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestHash(): Promise<ManifestHash> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @param address the address of the account queried
+	 * @return Boolean
+	 * @dev Retrieves if the address is a trusted handler from the escrow instance
+	 */
+	async isTrustedHandler(address: Address): Promise<Boolean> {
+		return true
+	}
+
+	/**
+	 * @return balance of escrow instance
+	 */
+	async balance(): Promise<Number> {
+		return 4
+	}
+	/**
+	 * @returns address of escrow instance
+	 */
+	async escrowAddressFromId(): Promise<Address> {
+		return "temp"
+	}
+
+	/**
+	 * @privKey private key of user who encrypted manifest
+	 * @manifestUrl The url of the manifest to return
+	 * @returns the plain text manifest if can't decrypt 
+	 */
+	async manifest(manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest | boolean> {
+		// call download()
+		// return manifest
+	}
+	/**
+	 * 
+	 * @param privKey Private Key of encrypted data
+	 * @param index index of intermediate result to get
+	 * @returns The manifest or false if can't decrypt 
+	 */
+	async intermediateResults(privKey: PrivateKey, index: Number): Promise<Manifest | boolean> {
+		// handle  intermediate results
+		// get the intermediate result at index
+		// calls manifest with it
+	}
+	
+	/**
+	 * 
+	 * @param privKey Private Key of encrypted data
+	 * @returns The manifest or false if can't decrypt 
+	 */
+	async finalResults(privKey: PrivateKey): Promise<Manifest | Boolean> {
+		// call manifest with final result
 	}
 }
 
@@ -105,6 +185,7 @@ export class Job extends JobReads {
 		// uploads to S3 the encrypted results 
 		// if escrow Id use, if not use this.escrowId
 		// calls intermediate results
+		// stores it this.intermediateResults = []
 		return true
 	}
 
