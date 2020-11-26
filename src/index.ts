@@ -1,4 +1,4 @@
-import getApi from './utils/getApi'
+import setup from './utils/setup'
 import {JobReads, Job} from './job'
 
-export { getApi, JobReads, Job }
+export { setup, JobReads, Job }

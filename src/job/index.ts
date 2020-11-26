@@ -1,18 +1,19 @@
 import { ApiPromise, Keyring } from '@polkadot/api'
+import { KeyringPair } from '@polkadot/keyring/types';
 import { Credentials, Payouts } from '../interfaces'
 import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 
-function signAndSend(call, api, sender) {
-	return call.signAndSend(sender, ({ status, events, dispatchError }) => {
+function signAndSend(call: any, api: ApiPromise, sender: any) {
+	return call.signAndSend(sender, ({ status, events, dispatchError }: any) => {
 		// status would still be set, but in the case of error we can shortcut
 		// to just check it (so an error would indicate InBlock or Finalized)
 		if (dispatchError) {
 			if (dispatchError.isModule) {
 			// for module errors, we have the section indexed, lookup
 			const decoded = api.registry.findMetaError(dispatchError.asModule);
-			const { documentation, method, section } = decoded;
+			const { documentation, name, section } = decoded;
 
-				console.log(`${section}.${method}: ${documentation.join(" ")}`);
+				console.log(`${section}.${name}: ${documentation.join(" ")}`);
 			} else {
 			// Other, CannotLookup, BadOrigin, no extra info
 				console.log(dispatchError.toString());
@@ -136,7 +137,12 @@ export class Job extends JobReads {
 	static async createEscrow(
 		api: ApiPromise,
 		keyring: Keyring,
-		multiCredentials?: Array<Address>
+		sender: KeyringPair,
+		manifestUrl: String,
+		manifestHash: String,
+		reputation_oracle: Address,
+		recording_oracle: Address,
+		oracle_stake: Number,
 		): Promise<Job> {
 			// trustedHandlers are the multi credentials 
 			// get info from manifest
@@ -146,14 +152,11 @@ export class Job extends JobReads {
 			// hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
 			// creates an escrow instance on chain
 			// Sets the Id globally this.escrowId = escrowId
-			const alice = keyring.addFromUri('//Alice');
-			const bob = keyring.addFromUri('//Bob');
-			const handlers = [];
-			const call = api.tx.escrow.create(alice, handlers, manifestUrl, manifestHash, bob, bob, 10, 10);
+			const call: any = api.tx.escrow.create(manifestUrl, manifestHash, reputation_oracle, recording_oracle, oracle_stake, oracle_stake);
 
-			await signAndSend(call, api, alice);
-
-			return Promise.resolve(Job(api, id, keyring));
+			await signAndSend(call, api, sender)
+			let id: EscrowId = 0
+			return Promise.resolve(new Job(api, id, keyring));
 			
 	}
 
