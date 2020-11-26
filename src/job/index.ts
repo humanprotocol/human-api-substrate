@@ -1,7 +1,30 @@
-import { ApiPromise } from '@polkadot/api'
+import { ApiPromise, Keyring } from '@polkadot/api'
 import { Credentials, Payouts } from '../interfaces'
 import { EscrowId, Address, PublicKey, Results } from '../types'
+import { manifestHash, manifestUrl } from '../utils/escrowGetters';
 
+function signAndSend(call, api, sender) {
+	return call.signAndSend(sender, ({ status, events, dispatchError }) => {
+		// status would still be set, but in the case of error we can shortcut
+		// to just check it (so an error would indicate InBlock or Finalized)
+		if (dispatchError) {
+			if (dispatchError.isModule) {
+			// for module errors, we have the section indexed, lookup
+			const decoded = api.registry.findMetaError(dispatchError.asModule);
+			const { documentation, method, section } = decoded;
+
+				console.log(`${section}.${method}: ${documentation.join(" ")}`);
+			} else {
+			// Other, CannotLookup, BadOrigin, no extra info
+				console.log(dispatchError.toString());
+			}
+		} else {
+			if (status.isFinalized) {
+				console.log("transaction successful");
+			}
+		}
+	});
+}
 
 //TODO split these classes up into dedicated files
 export class JobReads { 
@@ -12,14 +35,14 @@ export class JobReads {
 		this.api = api
 		this.escrowId = escrowId
 	}
-
 }
-export class Job extends JobReads {
-	credentials: Credentials
 
-	constructor (api: ApiPromise,  escrowId: EscrowId, credentials: Credentials) {
+export class Job extends JobReads {
+	keyring: Keyring
+
+	constructor (api: ApiPromise, escrowId: EscrowId, keyring: Keyring) {
 		super(api, escrowId);
-		this.credentials = credentials
+		this.keyring = keyring;
 	}
 	
 	static async launch (
@@ -30,9 +53,11 @@ export class Job extends JobReads {
 		return true
 	}
 
-	static async create_escrow(
+	static async createEscrow(
+		api: ApiPromise,
+		keyring: Keyring,
 		multiCredentials?: Array<Address>
-		): Promise<Boolean> {
+		): Promise<Job> {
 			// trustedHandlers are the multi credentials 
 			// get info from manifest
 			// reputation_oracle_stake from manifest (make sure it is in right format)
@@ -41,7 +66,14 @@ export class Job extends JobReads {
 			// hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
 			// creates an escrow instance on chain
 			// Sets the Id globally this.escrowId = escrowId
-			return true
+			const alice = keyring.addFromUri('//Alice');
+			const bob = keyring.addFromUri('//Bob');
+			const handlers = [];
+			const call = api.tx.escrow.create(alice, handlers, manifestUrl, manifestHash, bob, bob, 10, 10);
+
+			await signAndSend(call, api, alice);
+
+			return Promise.resolve(Job(api, id, keyring));
 			
 	}
 
