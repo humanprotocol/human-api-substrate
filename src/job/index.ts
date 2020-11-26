@@ -1,41 +1,36 @@
 import { ApiPromise } from '@polkadot/api'
 import { Credentials, Payouts } from '../interfaces'
-import { EscrowManifest, EscrowId, Address, PublicKey, Results } from '../types'
+import { EscrowId, Address, PublicKey, Results } from '../types'
 
 
 //TODO split these classes up into dedicated files
-export class JobBase { 
+export class JobReads { 
 	api: ApiPromise;
-	credentials: Credentials | null
-	manifest: EscrowManifest | null
+	escrowId: EscrowId
 	
-	constructor (api: ApiPromise, credentials?: Credentials, manifest?: EscrowManifest) {
+	constructor (api: ApiPromise, escrowId: EscrowId) {
 		this.api = api
-		this.credentials = credentials ? credentials : null
-		this.manifest = manifest ? manifest : null
+		this.escrowId = escrowId
 	}
 
 }
-
-export class JobReads extends JobBase {
-	constructor(api: ApiPromise, credentials?: Credentials, manifest?: EscrowManifest) {
-		super(api, credentials, manifest);
-	  }
-}
-
 export class Job extends JobReads {
-	constructor (api: ApiPromise, credentials: Credentials, manifest: EscrowManifest) {
-		super(api, credentials, manifest);
+	credentials: Credentials
+
+	constructor (api: ApiPromise,  escrowId: EscrowId, credentials: Credentials) {
+		super(api, escrowId);
+		this.credentials = credentials
 	}
 	
-	async launch (
+	static async launch (
 
 	): Promise<Boolean> {
 		// calls upload returns hash and url 
 		// creates escrow()
 		return true
 	}
-	async create_escrow(
+
+	static async create_escrow(
 		multiCredentials?: Array<Address>
 		): Promise<Boolean> {
 			// trustedHandlers are the multi credentials 
