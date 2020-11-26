@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api'
 import { Credentials, Payouts } from '../interfaces'
-import { EscrowId, Address, PublicKey, Results } from '../types'
+import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 
 
 //TODO split these classes up into dedicated files
@@ -13,7 +13,73 @@ export class JobReads {
 		this.escrowId = escrowId
 	}
 
+	/**
+	 * 
+	 * @return Status of the Escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization.
+
+	*/
+	async status(): Promise<Status>  {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Url of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestUrl(): Promise<ManifestUrl> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Hash of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestHash(): Promise<ManifestHash> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @param address the address of the account queried
+	 * @return Boolean
+	 * @dev Retrieves if the address is a trusted handler from the escrow instance
+	 */
+	async isTrustedHandler(address: Address): Promise<Boolean> {
+		return true
+	}
+
+	/**
+	 * @return balance of escrow instance
+	 */
+	async balance(): Promise<Number> {
+		return 4
+	}
+	/**
+	 * @returns address of escrow instance
+	 */
+	async escrowAddressFromId(): Promise<Address> {
+		return "temp"
+	}
+
+	/**
+	 * @privKey private key of user who encrypted manifest
+	 * @manifestUrl The url of the manifest to return
+	 * @returns the plain text manifest
+	 */
+	async manifest(manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest> {
+		// call download()
+		// return manifest
+	}
+
+	async intermediateResults(privKey: PrivateKey, index: Number): Promise<Manifest> {
+		// get the intermediate result at index
+		// calls manifest with it
+	}
 }
+
 export class Job extends JobReads {
 	credentials: Credentials
 
@@ -73,6 +139,7 @@ export class Job extends JobReads {
 		// uploads to S3 the encrypted results 
 		// if escrow Id use, if not use this.escrowId
 		// calls intermediate results
+		// stores it this.intermediateResults = []
 		return true
 	}
 
