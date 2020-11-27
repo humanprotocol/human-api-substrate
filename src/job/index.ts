@@ -1,7 +1,30 @@
-import { ApiPromise } from '@polkadot/api'
+import { ApiPromise, Keyring } from '@polkadot/api'
+import { KeyringPair } from '@polkadot/keyring/types';
 import { Credentials, Payouts } from '../interfaces'
-import { EscrowId, Address, PublicKey, Results } from '../types'
+import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 
+function signAndSend(call: any, api: ApiPromise, sender: any) {
+	return call.signAndSend(sender, ({ status, events, dispatchError }: any) => {
+		// status would still be set, but in the case of error we can shortcut
+		// to just check it (so an error would indicate InBlock or Finalized)
+		if (dispatchError) {
+			if (dispatchError.isModule) {
+			// for module errors, we have the section indexed, lookup
+			const decoded = api.registry.findMetaError(dispatchError.asModule);
+			const { documentation, name, section } = decoded;
+
+				console.log(`${section}.${name}: ${documentation.join(" ")}`);
+			} else {
+			// Other, CannotLookup, BadOrigin, no extra info
+				console.log(dispatchError.toString());
+			}
+		} else {
+			if (status.isFinalized) {
+				console.log("transaction successful");
+			}
+		}
+	});
+}
 
 //TODO split these classes up into dedicated files
 export class JobReads { 
@@ -13,13 +36,94 @@ export class JobReads {
 		this.escrowId = escrowId
 	}
 
-}
-export class Job extends JobReads {
-	credentials: Credentials
+	/**
+	 * 
+	 * @return Status of the Escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization.
 
-	constructor (api: ApiPromise,  escrowId: EscrowId, credentials: Credentials) {
+	*/
+	async status(): Promise<Status>  {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Url of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestUrl(): Promise<ManifestUrl> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @return Manifest Hash of the escrow instance
+	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
+	 */
+	async manifestHash(): Promise<ManifestHash> {
+		return "temp"
+	}
+
+	/**
+	 * 
+	 * @param address the address of the account queried
+	 * @return Boolean
+	 * @dev Retrieves if the address is a trusted handler from the escrow instance
+	 */
+	async isTrustedHandler(address: Address): Promise<Boolean> {
+		return true
+	}
+
+	/**
+	 * @return balance of escrow instance
+	 */
+	async balance(): Promise<Number> {
+		return 4
+	}
+	/**
+	 * @returns address of escrow instance
+	 */
+	async escrowAddressFromId(): Promise<Address> {
+		return "temp"
+	}
+
+	/**
+	 * @privKey private key of user who encrypted manifest
+	 * @manifestUrl The url of the manifest to return
+	 * @returns the plain text manifest if can't decrypt 
+	 */
+	async manifest(manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest | boolean> {
+		// call download()
+		// return manifest
+	}
+	/**
+	 * 
+	 * @param privKey Private Key of encrypted data
+	 * @param index index of intermediate result to get
+	 * @returns The manifest or false if can't decrypt 
+	 */
+	async intermediateResults(privKey: PrivateKey, index: Number): Promise<Manifest | boolean> {
+		// handle  intermediate results
+		// get the intermediate result at index
+		// calls manifest with it
+	}
+	
+	/**
+	 * 
+	 * @param privKey Private Key of encrypted data
+	 * @returns The manifest or false if can't decrypt 
+	 */
+	async finalResults(privKey: PrivateKey): Promise<Manifest | Boolean> {
+		// call manifest with final result
+	}
+}
+
+export class Job extends JobReads {
+	keyring: Keyring
+
+	constructor (api: ApiPromise, escrowId: EscrowId, keyring: Keyring) {
 		super(api, escrowId);
-		this.credentials = credentials
+		this.keyring = keyring;
 	}
 	
 	static async launch (
@@ -30,9 +134,16 @@ export class Job extends JobReads {
 		return true
 	}
 
-	static async create_escrow(
-		multiCredentials?: Array<Address>
-		): Promise<Boolean> {
+	static async createEscrow(
+		api: ApiPromise,
+		keyring: Keyring,
+		sender: KeyringPair,
+		manifestUrl: String,
+		manifestHash: String,
+		reputation_oracle: Address,
+		recording_oracle: Address,
+		oracle_stake: Number,
+		): Promise<Job> {
 			// trustedHandlers are the multi credentials 
 			// get info from manifest
 			// reputation_oracle_stake from manifest (make sure it is in right format)
@@ -41,7 +152,11 @@ export class Job extends JobReads {
 			// hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
 			// creates an escrow instance on chain
 			// Sets the Id globally this.escrowId = escrowId
-			return true
+			const call: any = api.tx.escrow.create(manifestUrl, manifestHash, reputation_oracle, recording_oracle, oracle_stake, oracle_stake);
+
+			await signAndSend(call, api, sender)
+			let id: EscrowId = 0
+			return Promise.resolve(new Job(api, id, keyring));
 			
 	}
 
@@ -73,6 +188,7 @@ export class Job extends JobReads {
 		// uploads to S3 the encrypted results 
 		// if escrow Id use, if not use this.escrowId
 		// calls intermediate results
+		// stores it this.intermediateResults = []
 		return true
 	}
 
