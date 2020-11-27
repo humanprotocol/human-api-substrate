@@ -13,7 +13,7 @@ describe('', async () => {
 		api.disconnect()
     })
 
-	it(`create an escrow`, async () => {
+	it.skip(`create an escrow`, async () => {
         const alice = keyring.addFromUri('//Alice')
         const bob = keyring.addFromUri('//Bob')
         const charlie = keyring.addFromUri('//Charlie')
