@@ -9,16 +9,27 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.aws_secret_access_key
 });
 
-export const upload = async (pubKey: String, manifest: Manifest): Promise<ManifestInfo> => {
-		const hashedManifest = hash(manifest)
-		console.log(hashedManifest)
-		// hashes manifest
-		// encrypts manifest with public key
-		// takes manifest sends it to S3 
-		
+export const upload = async (manifest: Manifest, pubKey?: String): Promise<ManifestInfo> => {
+		const manifestHash = hash(JSON.stringify(manifest))
+		const Bucket_Name: String = process.env.BUCKET_NAME ? process.env.BUCKET_NAME : " "
+		const Key = `s3${manifestHash}`
+		const params: AWS.S3.Types.PutObjectRequest = {
+			Bucket: Bucket_Name.toString(),
+			Key, // File name you want to save as in S3
+			Body: JSON.stringify(manifest),
+			ContentType: 'application/json; charset=utf-8',
+		};
+		const returnedInfo: any = await new Promise((resolve, reject) => {
+			s3.upload(params, (error, data) => {
+				if (error) {
+				  return reject(error)
+				}
+				return resolve(data)
+			  })			
+		})
 		return  {
-			manifestHash: "test",
-			manifestUrl: "test",
+			manifestHash,
+			manifestUrl: returnedInfo.Location
 		}
 	}
 
