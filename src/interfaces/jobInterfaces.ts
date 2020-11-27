@@ -14,3 +14,4 @@ export interface Payouts {
 	to: Address, 
 	Amount: Number
 }
+
