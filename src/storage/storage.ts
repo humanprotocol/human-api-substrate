@@ -9,9 +9,10 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.aws_secret_access_key
 });
 
+const Bucket_Name: String = process.env.BUCKET_NAME ? process.env.BUCKET_NAME : " "
+
 export const upload = async (manifest: Manifest, pubKey?: String): Promise<ManifestInfo> => {
 		const manifestHash = hash(JSON.stringify(manifest))
-		const Bucket_Name: String = process.env.BUCKET_NAME ? process.env.BUCKET_NAME : " "
 		const Key = `s3${manifestHash}`
 		const params: AWS.S3.Types.PutObjectRequest = {
 			Bucket: Bucket_Name.toString(),
@@ -35,8 +36,21 @@ export const upload = async (manifest: Manifest, pubKey?: String): Promise<Manif
 	}
 
 
-export const download = async (manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest> => {
-	// grabs manifest from s3
-	// tries to decrypt with private key
-	// returns decrypted
+export const download = async (manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest> => {
+	const Key = manifestUrl.slice(50)
+	const params: AWS.S3.Types.PutObjectRequest = {
+		Bucket: Bucket_Name.toString(),
+		Key, 
+	};
+
+	const returnedInfo: any = await new Promise((resolve, reject) => {
+		s3.getObject(params, (error, data) => {
+			if (error) {
+			  return reject(error)
+			}
+			return resolve(data)
+		  })			
+	})
+
+	return returnedInfo.Body.toString()
 }

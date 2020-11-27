@@ -63,11 +63,11 @@ export class JobReads {
 	}
 	
 	/**
-	 * @privKey private key of user who encrypted manifest
-	 * @manifestUrl The url of the manifest to return
+	 * @param privKey private key of user who encrypted manifest
+	 * @param manifestUrl The url of the manifest to return
 	 * @returns the plain text manifest if can't decrypt 
 	 */
-	async manifest(manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest | boolean> {
+	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest | boolean> {
 		// call download()
 		// return manifest
 	}
@@ -77,7 +77,7 @@ export class JobReads {
 	 * @param index index of intermediate result to get
 	 * @returns The manifest or false if can't decrypt 
 	 */
-	async intermediateResults(privKey: PrivateKey, index: Number): Promise<Manifest | boolean> {
+	async intermediateResults(index: Number, privKey?: PrivateKey): Promise<Manifest | boolean> {
 		// handle  intermediate results
 		// get the intermediate result at index
 		// calls manifest with it
@@ -88,7 +88,7 @@ export class JobReads {
 	 * @param privKey Private Key of encrypted data
 	 * @returns The manifest or false if can't decrypt 
 	 */
-	async finalResults(privKey: PrivateKey): Promise<Manifest | Boolean> {
+	async finalResults(privKey?: PrivateKey): Promise<Manifest | Boolean> {
 		// call manifest with final result
 	}
 }
