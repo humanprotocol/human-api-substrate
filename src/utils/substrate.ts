@@ -1,7 +1,7 @@
 import { Keyring } from '@polkadot/keyring'
 import { PrivateKey, Address, Account, Decimals } from '../types'
 import { ApiPromise } from '@polkadot/api'
-
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 /**
  * @param privateKey Private key of contract launcher
@@ -25,4 +25,8 @@ export const privateKeyToAccount = (privateKey: PrivateKey): Account => {
 
 export const getDecimals = (api: ApiPromise): Decimals => {
 	return api.registry.chainDecimals
+}
+
+export const hash = (data: Uint8Array | string): string => {
+	return blake2AsHex(data)
 }

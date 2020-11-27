@@ -2,7 +2,7 @@ import { Job, setup, JobReads } from '../src/index';
 import BN from 'bn.js';
 const assert = require('assert');
 
-describe('', async () => {
+describe('Job reads', async () => {
     let api: any
 	let keyring: any
 	let jobRead: any
