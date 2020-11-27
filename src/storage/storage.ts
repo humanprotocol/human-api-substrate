@@ -18,6 +18,7 @@ export const upload = async (manifest: Manifest, pubKey?: String): Promise<Manif
 			Key, // File name you want to save as in S3
 			Body: JSON.stringify(manifest),
 			ContentType: 'application/json; charset=utf-8',
+			// ACL: 'public-read', TODO decide if this needs to go in
 		};
 		const returnedInfo: any = await new Promise((resolve, reject) => {
 			s3.upload(params, (error, data) => {
