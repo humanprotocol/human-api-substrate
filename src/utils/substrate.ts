@@ -29,6 +29,15 @@ export const getDecimals = (api: ApiPromise): Decimals => {
 	return api.registry.chainDecimals
 }
 
+/**
+ * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`. Then
+ * calls `onRecord` with the resulting event record and resolves the promise.
+ * @param api api object
+ * @param call a call that can be submitted to the chain
+ * @param sender the sender of the transaction
+ * @param filter which event to filter for
+ * @param onRecord the callback pass the event record to that will resolve the promise this function returns
+ */
 export function signSendAndWaitForEvent<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}, onRecord: (e: EventRecord) => R): Promise<R> {
 	return new Promise<R>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
