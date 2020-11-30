@@ -1,32 +1,12 @@
-import { ApiPromise, Keyring } from '@polkadot/api'
+import { ApiPromise, Keyring, SubmittableResult } from '@polkadot/api'
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Credentials, Payouts } from '../interfaces'
+import { Payouts } from '../interfaces'
 import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
-
-function signAndSend(call: any, api: ApiPromise, sender: any) {
-	return call.signAndSend(sender, ({ status, events, dispatchError }: any) => {
-		// status would still be set, but in the case of error we can shortcut
-		// to just check it (so an error would indicate InBlock or Finalized)
-		if (dispatchError) {
-			if (dispatchError.isModule) {
-			// for module errors, we have the section indexed, lookup
-			const decoded = api.registry.findMetaError(dispatchError.asModule);
-			const { documentation, name, section } = decoded;
-
-				console.log(`${section}.${name}: ${documentation.join(" ")}`);
-			} else {
-			// Other, CannotLookup, BadOrigin, no extra info
-				console.log(dispatchError.toString());
-			}
-		} else {
-			if (status.isFinalized) {
-				console.log("transaction successful");
-			}
-		}
-	});
-}
+import { signSendAndWaitForEvent } from '../utils/substrate';
 
 //TODO split these classes up into dedicated files
+
 export class JobReads { 
 	api: ApiPromise;
 	escrowId: EscrowId
@@ -151,12 +131,18 @@ export class Job extends JobReads {
 			// amount int(int(manifest["job_total_tasks"]) * Decimal(manifest["task_bid_price"]))
 			// hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
 			// creates an escrow instance on chain
-			// Sets the Id globally this.escrowId = escrowId
-			const call: any = api.tx.escrow.create(manifestUrl, manifestHash, reputation_oracle, recording_oracle, oracle_stake, oracle_stake);
+			const call: SubmittableExtrinsic<'promise'> = api.tx.escrow.create(manifestUrl, manifestHash, reputation_oracle, recording_oracle, oracle_stake, oracle_stake)
 
-			await signAndSend(call, api, sender)
-			let id: EscrowId = 0
-			return Promise.resolve(new Job(api, id, keyring));
+			const idPromise = signSendAndWaitForEvent(api, call, sender, { section: "escrow", name: "Pending"}, ( record) => {
+				// The first element in the `Pending` event is the escrow id.
+				// Note: This is note type safe in any way. Todo: Find more principled way.
+				const id: EscrowId = Number(record.event.data[0].toString())
+				return id
+			})
+			
+			return idPromise.then((id: EscrowId) => {
+				return new Job(api, id, keyring)
+			});
 			
 	}
 
