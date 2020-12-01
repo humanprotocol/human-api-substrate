@@ -1,9 +1,9 @@
 import { Keyring } from '@polkadot/keyring'
 import { PrivateKey, Address, Account, Decimals } from '../types'
 import { ApiPromise, SubmittableResult } from '@polkadot/api'
-import { EventRecord } from '@polkadot/types/interfaces/types';
-import { SubmittableExtrinsic } from '@polkadot/api/types';
-
+import { EventRecord } from '@polkadot/types/interfaces/types'
+import { SubmittableExtrinsic } from '@polkadot/api/types'
+import { blake2AsHex } from '@polkadot/util-crypto'
 
 /**
  * @param privateKey Private key of contract launcher
@@ -63,4 +63,8 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 			}
 		})
 	})
+}
+
+export const hash = (data: Uint8Array | string): string => {
+	return blake2AsHex(data)
 }
