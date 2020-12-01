@@ -1,6 +1,7 @@
 import { ApiPromise, Keyring } from '@polkadot/api'
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Credentials, Payouts } from '../interfaces'
+import { Credentials, Payouts, EscrowInfo } from '../interfaces'
+import BN from 'bn.js';
 import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 
 function signAndSend(call: any, api: ApiPromise, sender: any) {
@@ -36,32 +37,9 @@ export class JobReads {
 		this.escrowId = escrowId
 	}
 
-	/**
-	 * 
-	 * @return Status of the Escrow instance
-	 * @dev Retrieves the deployed manifest url uploaded on Job initialization.
-
-	*/
-	async status(): Promise<Status>  {
-		return "temp"
-	}
-
-	/**
-	 * 
-	 * @return Manifest Url of the escrow instance
-	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
-	 */
-	async manifestUrl(): Promise<ManifestUrl> {
-		return "temp"
-	}
-
-	/**
-	 * 
-	 * @return Manifest Hash of the escrow instance
-	 * @dev Retrieves the deployed manifest url uploaded on Job initialization
-	 */
-	async manifestHash(): Promise<ManifestHash> {
-		return "temp"
+	async escrow(): Promise<any> {
+		const escrow = await this.api.query.escrow.escrows(this.escrowId)
+		return escrow.toJSON()
 	}
 
 	/**
@@ -70,29 +48,26 @@ export class JobReads {
 	 * @return Boolean
 	 * @dev Retrieves if the address is a trusted handler from the escrow instance
 	 */
-	async isTrustedHandler(address: Address): Promise<Boolean> {
-		return true
+	async isTrustedHandler(address: Address): Promise<any> {
+		const isTrustedHander = await this.api.query.escrow.trustedHandlers(this.escrowId, address.toString())
+		return isTrustedHander.toHuman()
 	}
 
 	/**
 	 * @return balance of escrow instance
 	 */
-	async balance(): Promise<Number> {
-		return 4
+	async balance(): Promise<BN> {
+		const escrow = await this.escrow()
+		const balance = await this.api.query.system.account(escrow.account)
+		return balance.data.free
 	}
+	
 	/**
-	 * @returns address of escrow instance
-	 */
-	async escrowAddressFromId(): Promise<Address> {
-		return "temp"
-	}
-
-	/**
-	 * @privKey private key of user who encrypted manifest
-	 * @manifestUrl The url of the manifest to return
+	 * @param privKey private key of user who encrypted manifest
+	 * @param manifestUrl The url of the manifest to return
 	 * @returns the plain text manifest if can't decrypt 
 	 */
-	async manifest(manifestUrl: ManifestUrl, privKey: PrivateKey): Promise<Manifest | boolean> {
+	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest | boolean> {
 		// call download()
 		// return manifest
 	}
@@ -102,7 +77,7 @@ export class JobReads {
 	 * @param index index of intermediate result to get
 	 * @returns The manifest or false if can't decrypt 
 	 */
-	async intermediateResults(privKey: PrivateKey, index: Number): Promise<Manifest | boolean> {
+	async intermediateResults(index: Number, privKey?: PrivateKey): Promise<Manifest | boolean> {
 		// handle  intermediate results
 		// get the intermediate result at index
 		// calls manifest with it
@@ -113,7 +88,7 @@ export class JobReads {
 	 * @param privKey Private Key of encrypted data
 	 * @returns The manifest or false if can't decrypt 
 	 */
-	async finalResults(privKey: PrivateKey): Promise<Manifest | Boolean> {
+	async finalResults(privKey?: PrivateKey): Promise<Manifest | Boolean> {
 		// call manifest with final result
 	}
 }
@@ -155,7 +130,7 @@ export class Job extends JobReads {
 			const call: any = api.tx.escrow.create(manifestUrl, manifestHash, reputation_oracle, recording_oracle, oracle_stake, oracle_stake);
 
 			await signAndSend(call, api, sender)
-			let id: EscrowId = 0
+			let id: EscrowId = new BN(0) 
 			return Promise.resolve(new Job(api, id, keyring));
 			
 	}

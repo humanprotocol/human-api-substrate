@@ -1,4 +1,6 @@
-export type EscrowId = Number;
+import BN from 'bn.js';
+
+export type EscrowId = BN;
 
 export type Status = String;
 
@@ -21,3 +23,5 @@ export type Decimals = Number;
 export type Results = any;
 
 export type Manifest = any;
+
+export type EndTime = Number;
