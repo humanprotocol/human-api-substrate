@@ -21,7 +21,7 @@ describe('Job reads', async () => {
 		const charlie = keyring.addFromUri('//Charlie')
         const manifestUrl = "some.url"
         const manifestHash = "0xdev"
-		await Job.createEscrow(api, keyring, alice, manifestUrl, manifestHash, bob.address, charlie.address, 10);
+		await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, 10);
 		jobRead = new JobReads(api, new BN(0))
 	})
 	after(function(){

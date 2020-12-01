@@ -3,8 +3,8 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Payouts } from '../interfaces'
 import BN from 'bn.js';
-import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
-import { sendAndWaitFor } from '../utils/substrate';
+import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest, Stake, Amount } from '../types'
+import { sendAndWaitFor, formatDecimals } from '../utils/substrate';
 import { upload, download } from '../storage'
 
 //TODO split these classes up into dedicated files
@@ -83,30 +83,34 @@ export class JobReads {
 }
 
 export class Job extends JobReads {
-  keyring: Keyring;
-  finalUrl: Manifest;
+  sender: KeyringPair;
+  finalUrl: ManifestUrl | null;
   storedIntermediateResults: any;
+  amount: BN | null;
 
-  constructor(api: ApiPromise, escrowId: EscrowId, keyring: Keyring) {
+  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
     super(api, escrowId);
-	this.keyring = keyring;
+    this.sender = sender;
+    this.finalUrl = null;
+    this.amount = null
   }
 
-  static async launch(): Promise<Boolean> {
-	// calls upload returns hash and url
-	// get info from manifest
-    // reputation_oracle_stake from manifest (make sure it is in right format)
-    // recording_oracle_stake from manifest (make sure it is in right format)
-    // amount int(int(manifest["job_total_tasks"]) * Decimal(manifest["task_bid_price"]))
-    // hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
-    // creates escrow()
-    return true;
+  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest): Promise<Boolean> {
+    const reputationOracle = manifest.reputation_oracle_addr
+    const recordingOracle = manifest.recording_oracle_addr
+    const oracleStake = new BN(manifest.oracle_stake).mul(new BN(100))
+    const amount = new BN(manifest.job_total_tasks).mul(new BN(manifest.task_bid_price))
+    const formattedAmount = formatDecimals(api, amount)
+    const manifestInfo = await upload(manifest) 
+    const job = await this.createEscrow(api, sender, manifestInfo.manifestUrl, manifestInfo.manifestHash, reputationOracle, recordingOracle, oracleStake)
+    const escrow = await job.escrow()
+    await job.fundEscrow(escrow.account, formattedAmount)
+    return true
   }
 
   /**
    * Create an escrow on chain and return a new Job instance to interact with.
    * @param api object for interacting with the chain
-   * @param keyring used for signing
    * @param sender sender of the transaction to create the escrow
    * @param manifestUrl 
    * @param manifestHash 
@@ -116,13 +120,12 @@ export class Job extends JobReads {
    */
   static async createEscrow(
     api: ApiPromise,
-    keyring: Keyring,
     sender: KeyringPair,
     manifestUrl: String,
     manifestHash: String,
     reputationOracle: Address,
     recordingOracle: Address,
-    oracleStake: Number
+    oracleStake: Stake
   ): Promise<Job> {
     const call: SubmittableExtrinsic<"promise"> = api.tx.escrow.create(
       manifestUrl,
@@ -137,12 +140,19 @@ export class Job extends JobReads {
       .then((record) => {
         // The first element in the `Pending` event is the escrow id.
         // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(Number(record.event.data[0].toString()));
+        const id: EscrowId = new BN(record.event.data[0].toString());
         return id;
       })
       .then((id: EscrowId) => {
-        return new Job(api, id, keyring);
+        return new Job(api, sender, id);
       });
+  }
+
+  async fundEscrow(escrowAddress: Address, amount: Amount): Promise<Boolean> {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount)
+    await sendAndWaitFor(this.api, call, this.sender, {section: "balances", name: "Transfer"})
+    // TODO test failing transfer
+    return true 
   }
 
   async addTrustedHandlers(handlers: Array<Address>, escrowId?: EscrowId): Promise<Boolean> {
@@ -154,36 +164,30 @@ export class Job extends JobReads {
     payouts: Array<Payouts>,
     results: Results,
     pubKey: PublicKey,
-    escrowId?: EscrowId
   ): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
     // uploads results to url
     // calls bulk payout batched with upload function
     return true;
   }
 
-  async abort(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
+  async abort(): Promise<Boolean> {
     // calls abort from original gas payer
     return true;
   }
 
-  async cancel(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
+  async cancel(): Promise<Boolean> {
     // calls cancel from original gas payer
     return true;
   }
 
-  async storeIntermediateResults(results: Results, pubKey: PublicKey, escrowId?: EscrowId): Promise<Boolean> {
+  async storeIntermediateResults(results: Results, pubKey: PublicKey): Promise<Boolean> {
     // uploads to S3 the encrypted results
-    // if escrow Id use, if not use this.escrowId
     // calls intermediate results
     // stores it this.intermediateResults = []
     return true;
   }
 
-  async complete(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
+  async complete(): Promise<Boolean> {
     // sets state to complete
     return true;
   }

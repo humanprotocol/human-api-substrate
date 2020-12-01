@@ -1,6 +1,7 @@
 import { Job, setup } from "../src/index";
+import BN from 'bn.js';
 
-describe("", async () => {
+describe("job", async () => {
   let api: any;
   let keyring: any;
 
@@ -21,13 +22,12 @@ describe("", async () => {
     const manifestHash = "0xdev";
     const job = await Job.createEscrow(
       api,
-      keyring,
       alice,
       manifestUrl,
       manifestHash,
       bob.address,
       charlie.address,
-      10
+      new BN("10")
     );
   });
 });

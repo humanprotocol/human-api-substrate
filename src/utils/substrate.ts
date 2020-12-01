@@ -1,9 +1,10 @@
 import { Keyring } from '@polkadot/keyring'
-import { PrivateKey, Address, Account, Decimals } from '../types'
+import { PrivateKey, Address, Account, Decimals, Amount } from '../types'
 import { ApiPromise, SubmittableResult } from '@polkadot/api'
 import { EventRecord } from '@polkadot/types/interfaces/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import { blake2AsHex } from '@polkadot/util-crypto'
+import BN from 'bn.js';
 
 /**
  * @param privateKey Private key of contract launcher
@@ -26,8 +27,12 @@ export const privateKeyToAccount = (privateKey: PrivateKey): Account => {
 }
 
 export const getDecimals = (api: ApiPromise): Decimals => {
-	return api.registry.chainDecimals
+	return new BN(api.registry.chainDecimals)
 }
+
+export const formatDecimals = (api: ApiPromise, amount: Amount): Amount => {
+	return amount.mul(new BN(10).pow(getDecimals(api)))
+} 
 
 /**
  * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`.
