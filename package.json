@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
+    "test": "mocha -t 9000 -r ts-node/register 'tests/**/*.ts'",
     "compile": "tsc"
   },
   "keywords": [],
