@@ -30,16 +30,14 @@ export const getDecimals = (api: ApiPromise): Decimals => {
 }
 
 /**
- * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`. Then
- * calls `onRecord` with the resulting event record and resolves the promise.
+ * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`.
  * @param api api object
  * @param call a call that can be submitted to the chain
  * @param sender the sender of the transaction
  * @param filter which event to filter for
- * @param onRecord the callback pass the event record to that will resolve the promise this function returns
  */
-export function signSendAndWaitForEvent<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}, onRecord: (e: EventRecord) => R): Promise<R> {
-	return new Promise<R>((resolve, reject) => {
+export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}): Promise<EventRecord> {
+	return new Promise<EventRecord>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -58,7 +56,7 @@ export function signSendAndWaitForEvent<R>(api: ApiPromise, call: SubmittableExt
 			if (status.isInBlock || status.isFinalized) {
 				const record = res.findRecord(filter.section, filter.name);
 				if (record) {
-					resolve(onRecord(record))
+					resolve(record)
 				} else {
 					reject(Error("EventRecord not found"))
 				}
