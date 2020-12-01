@@ -5,16 +5,20 @@ import { Payouts } from '../interfaces'
 import BN from 'bn.js';
 import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
 import { sendAndWaitFor } from '../utils/substrate';
+import { upload, download } from '../storage'
 
 //TODO split these classes up into dedicated files
 
 export class JobReads { 
 	api: ApiPromise;
-	escrowId: EscrowId
-	
+	escrowId: EscrowId;
+	finalUrl: Manifest;
+	storedIntermediateResults: any;
+
 	constructor (api: ApiPromise, escrowId: EscrowId) {
 		this.api = api
 		this.escrowId = escrowId
+		this.storedIntermediateResults = []
 	}
 
 	async escrow(): Promise<any> {
@@ -45,40 +49,47 @@ export class JobReads {
 	/**
 	 * @param privKey private key of user who encrypted manifest
 	 * @param manifestUrl The url of the manifest to return
-	 * @returns the plain text manifest if can't decrypt 
+	 * @returns the plain text manifest or error if can't decrypt 
 	 */
-	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest | boolean> {
-		// call download()
-		// return manifest
+	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest> {
+		return download(manifestUrl, privKey)
 	}
 	/**
 	 * 
 	 * @param privKey Private Key of encrypted data
 	 * @param index index of intermediate result to get
-	 * @returns The manifest or false if can't decrypt 
+	 * @returns The manifest or error if can't decrypt 
 	 */
-	async intermediateResults(index: Number, privKey?: PrivateKey): Promise<Manifest | boolean> {
-		// handle  intermediate results
-		// get the intermediate result at index
-		// calls manifest with it
+	public async intermediateResults(index: any, privKey?: PrivateKey): Promise<Manifest> {
+    if (!this.storedIntermediateResults[index]) {
+      throw new Error("Intermediate Results out of bounds")
+    }
+    // TODO test this when able to (writes complete)
+		return this.manifest(this.storedIntermediateResults[index], privKey)
 	}
 	
 	/**
 	 * 
 	 * @param privKey Private Key of encrypted data
-	 * @returns The manifest or false if can't decrypt 
+	 * @returns The manifest, error if can't decrypt error if no final results
 	 */
-	async finalResults(privKey?: PrivateKey): Promise<Manifest | Boolean> {
-		// call manifest with final result
+	public async finalResults(privKey?: PrivateKey): Promise<Manifest> {
+    if (this.finalUrl) {
+      //TODO test this case after writes are able to demo
+      return this.manifest(this.finalUrl, privKey)
+    } 
+    throw new Error("No final results")
 	}
 }
 
 export class Job extends JobReads {
   keyring: Keyring;
+  finalUrl: Manifest;
+  storedIntermediateResults: any;
 
   constructor(api: ApiPromise, escrowId: EscrowId, keyring: Keyring) {
     super(api, escrowId);
-    this.keyring = keyring;
+	this.keyring = keyring;
   }
 
   static async launch(): Promise<Boolean> {

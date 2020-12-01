@@ -1,5 +1,7 @@
 import { Job, setup, JobReads } from '../src/index';
 import BN from 'bn.js';
+import manifest from '../example-manifest.json'
+import should from 'should'
 const assert = require('assert');
 
 describe('Job reads', async () => {
@@ -7,7 +9,8 @@ describe('Job reads', async () => {
 	let keyring: any
 	let jobRead: any
 	let alice: any
-	
+	const manifestUrl = 'https://human-parity-is-the-best.s3.amazonaws.com/s30xa750bbd503b5f1a93fcc37b6659455485e638592f57811fcc8e0e96c46f188c4'
+
 	before(async function(){
         let obj = await setup()
         api = obj.api
@@ -59,4 +62,36 @@ describe('Job reads', async () => {
 		assert.equal(isDaveTrusted, false)
 
 	})
+
+	it(`queries manifest`, async () => {
+		// assumes proper manifest url already stored in S3 bucket. 
+		// If fails, call storage, grab the proper url and try again
+		const result = await jobRead.manifest(manifestUrl)
+		assert.equal(result, JSON.stringify(manifest), "should retrieve manifest")
+
+	})
+
+	it(`fails to query intermediate results out of bounds`, async () => {
+		try {
+			await jobRead.intermediateResults(0)
+			should.fail('no error was thrown when it should have been', "")
+		} catch (e) {
+			assert.equal(
+				e.message, 
+				"Intermediate Results out of bounds"
+			)
+		}
+	})
+	it(`fails to query final results no final results yet`, async () => {
+		try {
+			await jobRead.finalResults()
+			should.fail('no error was thrown when it should have been', "")
+		} catch (e) {
+			assert.equal(
+				e.message, 
+				"No final results"
+			)
+		}
+	})
+
 })

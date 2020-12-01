@@ -1,4 +1,4 @@
-import { upload, download } from '../src/storage/storage'
+import { upload, download } from '../src/storage'
 import manifest from '../example-manifest.json'
 const assert = require('assert');
 

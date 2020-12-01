@@ -9,13 +9,14 @@ const s3 = new AWS.S3({
     secretAccessKey: process.env.aws_secret_access_key
 });
 
-const Bucket_Name: String = process.env.BUCKET_NAME ? process.env.BUCKET_NAME : " "
+const bucketName: String = process.env.bucket_name ? process.env.bucket_name : " "
 
 export const upload = async (manifest: Manifest, pubKey?: String): Promise<ManifestInfo> => {
+		//TODO handle encryption if pubkey
 		const manifestHash = hash(JSON.stringify(manifest))
 		const Key = `s3${manifestHash}`
 		const params: AWS.S3.Types.PutObjectRequest = {
-			Bucket: Bucket_Name.toString(),
+			Bucket: bucketName.toString(),
 			Key, // File name you want to save as in S3
 			Body: JSON.stringify(manifest),
 			ContentType: 'application/json; charset=utf-8',
@@ -37,9 +38,10 @@ export const upload = async (manifest: Manifest, pubKey?: String): Promise<Manif
 
 
 export const download = async (manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest> => {
+	// TODO handle decryption if privKey (throw error if no key)
 	const Key = manifestUrl.slice(50)
 	const params: AWS.S3.Types.PutObjectRequest = {
-		Bucket: Bucket_Name.toString(),
+		Bucket: bucketName.toString(),
 		Key, 
 	};
 
