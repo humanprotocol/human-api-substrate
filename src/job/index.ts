@@ -3,7 +3,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { Payouts } from '../interfaces'
 import BN from 'bn.js';
-import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest, Stake, Amount } from '../types'
+import { EscrowId, Address, PublicKey, Results, Status, Hash, Url, PrivateKey, Manifest, Stake, Amount } from '../types'
 import { sendAndWaitFor, formatDecimals } from '../utils/substrate';
 import { upload, download } from '../storage'
 
@@ -51,8 +51,8 @@ export class JobReads {
 	 * @param manifestUrl The url of the manifest to return
 	 * @returns the plain text manifest or error if can't decrypt 
 	 */
-	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest> {
-		return download(manifestUrl, privKey)
+	async manifest(url: Url, privKey?: PrivateKey): Promise<Manifest> {
+		return download(url, privKey)
 	}
 	/**
 	 * 
@@ -65,7 +65,7 @@ export class JobReads {
       throw new Error("Intermediate Results out of bounds")
     }
     // TODO test this when able to (writes complete)
-		return this.manifest(this.storedIntermediateResults[index].manifestUrl, privKey)
+		return this.manifest(this.storedIntermediateResults[index].url, privKey)
 	}
 	
 	/**
@@ -84,7 +84,7 @@ export class JobReads {
 
 export class Job extends JobReads {
   sender: KeyringPair;
-  finalUrl: ManifestUrl | null;
+  finalUrl: Url | null;
   storedIntermediateResults: any;
   amount: BN | null;
 
@@ -102,7 +102,7 @@ export class Job extends JobReads {
     const amount = manifest.job_total_tasks * manifest.task_bid_price
     const formattedAmount = formatDecimals(api, amount)
     const manifestInfo = await upload(manifest, pubKey) 
-    const job = await this.createEscrow(api, sender, manifestInfo.manifestUrl, manifestInfo.manifestHash, reputationOracle, recordingOracle, oracleStake)
+    const job = await this.createEscrow(api, sender, manifestInfo.url, manifestInfo.hash, reputationOracle, recordingOracle, oracleStake)
     const escrow = await job.escrow()
     await job.fundEscrow(escrow.account, formattedAmount)
     return job
@@ -183,9 +183,9 @@ export class Job extends JobReads {
 
   async storeIntermediateResults(results: Results, pubKey?: PublicKey): Promise<Boolean> {
     const resultInfo = await upload(results, pubKey)
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeResults(this.escrowId, resultInfo.manifestUrl, resultInfo.manifestHash)
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeResults(this.escrowId, resultInfo.url, resultInfo.hash)
     const record = await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "IntermediateStorage"})
-    this.storedIntermediateResults.push({manifestUrl: record.event.data[1].toHuman(), manifestHash: record.event.data[2].toHuman()})
+    this.storedIntermediateResults.push({url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman()})
     return true;
   }
 

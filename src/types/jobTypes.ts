@@ -4,9 +4,9 @@ export type EscrowId = BN;
 
 export type Status = String;
 
-export type ManifestUrl = String;
+export type Url = String;
 
-export type ManifestHash = String;
+export type Hash = String;
 
 export type PrivateKey = Uint8Array;
 
