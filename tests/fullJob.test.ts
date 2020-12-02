@@ -74,14 +74,51 @@ describe("job", async () => {
       alice,
       manifestUrl,
       manifestHash,
-      bob.address,
-      charlie.address,
-      new BN("10")
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
     );
     const amountToSend = await formatDecimals(api, 10)
     const escrow = await job.escrow();
     await job.fundEscrow(escrow.account, amountToSend)
     const escrowBalance = await job.balance();
     assert.equal(escrowBalance.toString(), amountToSend.toString(), "escrow should have funds")
+  });
+  it("aborts escrow", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+      );
+    const amountToSend = await formatDecimals(api, 10)
+    const escrowBefore = await job.escrow();
+    await job.fundEscrow(escrowBefore.account, amountToSend)    
+    await job.abort()
+    const escrow = await job.escrow();
+    assert.equal(escrow, null, "escrow should be deleted");
+  });
+  it("cancel escrow", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+      );
+    const amountToSend = await formatDecimals(api, 10)
+    const escrowBefore = await job.escrow();
+    await job.fundEscrow(escrowBefore.account, amountToSend)    
+    await job.cancel()
+    const escrow = await job.escrow();
+    mockData.end_time = escrow.end_time;
+    mockData.account = escrow.account;
+    mockData.status = "Cancelled"
+    assert.deepEqual(escrow, mockData, "escrow should be deleted");
   });
 });

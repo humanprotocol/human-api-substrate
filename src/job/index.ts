@@ -170,12 +170,14 @@ export class Job extends JobReads {
   }
 
   async abort(): Promise<Boolean> {
-    // calls abort from original gas payer
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "balances", name: "Transfer"})
     return true;
   }
 
   async cancel(): Promise<Boolean> {
-    // calls cancel from original gas payer
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "balances", name: "Transfer"})
     return true;
   }
 
