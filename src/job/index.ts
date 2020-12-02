@@ -151,7 +151,6 @@ export class Job extends JobReads {
   async fundEscrow(escrowAddress: Address, amount: Amount): Promise<Boolean> {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount)
     await sendAndWaitFor(this.api, call, this.sender, {section: "balances", name: "Transfer"})
-    // TODO test failing transfer
     return true 
   }
 
