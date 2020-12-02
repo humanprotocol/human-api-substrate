@@ -9,7 +9,7 @@ describe('Job reads', async () => {
 	let keyring: any
 	let jobRead: any
 	let alice: any
-	const manifestUrl = 'https://human-parity-is-the-best.s3.amazonaws.com/s30xa750bbd503b5f1a93fcc37b6659455485e638592f57811fcc8e0e96c46f188c4'
+	const manifestUrl = 'https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5'
 
 	before(async function(){
         let obj = await setup()
@@ -21,7 +21,7 @@ describe('Job reads', async () => {
 		const charlie = keyring.addFromUri('//Charlie')
         const manifestUrl = "some.url"
         const manifestHash = "0xdev"
-		await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, 10);
+		await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, new BN(10));
 		jobRead = new JobReads(api, new BN(0))
 	})
 	after(function(){

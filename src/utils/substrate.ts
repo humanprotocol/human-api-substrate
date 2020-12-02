@@ -26,12 +26,12 @@ export const privateKeyToAccount = (privateKey: PrivateKey): Account => {
 	return keyring.addFromSeed(privateKey)
 }
 
-export const getDecimals = (api: ApiPromise): Decimals => {
-	return new BN(api.registry.chainDecimals)
+export const getDecimals = (api: ApiPromise): number => {
+	return api.registry.chainDecimals
 }
 
-export const formatDecimals = (api: ApiPromise, amount: Amount): Amount => {
-	return amount.mul(new BN(10).pow(getDecimals(api)))
+export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
+	return new BN(amount * (10 ** getDecimals(api)))
 } 
 
 /**

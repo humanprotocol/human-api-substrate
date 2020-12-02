@@ -6,7 +6,7 @@ const assert = require('assert');
 
 
 
-describe('Storage', async () => {
+describe('utils', async () => {
 	let api: any
 
 	before(async function(){
@@ -18,13 +18,13 @@ describe('Storage', async () => {
     })
 	it("should hash a manifest", async function() {
 		const hashed = await hash(JSON.stringify(manifest))
-		const result = "0xa750bbd503b5f1a93fcc37b6659455485e638592f57811fcc8e0e96c46f188c4"
+		const result = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5"
 		assert.equal(hashed, result, "hashing should be correct")
 	})
 	it("should convert a number to proper decimals", async function() {
 		const decimals = await getDecimals(api)
 		assert.equal(decimals.toString(), "12", "there should be 12 decimals by default")
-		const formatted = await formatDecimals(api, new BN(10))
+		const formatted = await formatDecimals(api, 10)
 		assert.equal(formatted.toString(), "10000000000000", "balance should be converted properly")
 	})
 

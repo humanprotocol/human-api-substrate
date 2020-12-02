@@ -95,17 +95,17 @@ export class Job extends JobReads {
     this.amount = null
   }
 
-  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest): Promise<Boolean> {
+  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest): Promise<Job> {
     const reputationOracle = manifest.reputation_oracle_addr
     const recordingOracle = manifest.recording_oracle_addr
-    const oracleStake = new BN(manifest.oracle_stake).mul(new BN(100))
-    const amount = new BN(manifest.job_total_tasks).mul(new BN(manifest.task_bid_price))
+    const oracleStake = new BN(manifest.oracle_stake * 100)
+    const amount = manifest.job_total_tasks * manifest.task_bid_price
     const formattedAmount = formatDecimals(api, amount)
     const manifestInfo = await upload(manifest) 
     const job = await this.createEscrow(api, sender, manifestInfo.manifestUrl, manifestInfo.manifestHash, reputationOracle, recordingOracle, oracleStake)
     const escrow = await job.escrow()
     await job.fundEscrow(escrow.account, formattedAmount)
-    return true
+    return job
   }
 
   /**
