@@ -121,4 +121,19 @@ describe("job", async () => {
     mockData.status = "Cancelled"
     assert.deepEqual(escrow, mockData, "escrow should be deleted");
   });
+  it("stores intermediate results then fetches them", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+      );
+    const results =  { results: true }
+    await job.storeIntermediateResults(results)
+    const intermediateResults = await job.intermediateResults(0)
+    assert.deepEqual(JSON.parse(intermediateResults), results, "intermediated results should have been stored and retrieved properly")
+  });
 });

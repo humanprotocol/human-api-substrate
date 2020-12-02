@@ -65,7 +65,7 @@ export class JobReads {
       throw new Error("Intermediate Results out of bounds")
     }
     // TODO test this when able to (writes complete)
-		return this.manifest(this.storedIntermediateResults[index], privKey)
+		return this.manifest(this.storedIntermediateResults[index].manifestUrl, privKey)
 	}
 	
 	/**
@@ -95,13 +95,13 @@ export class Job extends JobReads {
     this.amount = null
   }
 
-  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest): Promise<Job> {
+  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest, pubKey?: PublicKey): Promise<Job> {
     const reputationOracle = manifest.reputation_oracle_addr
     const recordingOracle = manifest.recording_oracle_addr
     const oracleStake = new BN(manifest.oracle_stake * 100)
     const amount = manifest.job_total_tasks * manifest.task_bid_price
     const formattedAmount = formatDecimals(api, amount)
-    const manifestInfo = await upload(manifest) 
+    const manifestInfo = await upload(manifest, pubKey) 
     const job = await this.createEscrow(api, sender, manifestInfo.manifestUrl, manifestInfo.manifestHash, reputationOracle, recordingOracle, oracleStake)
     const escrow = await job.escrow()
     await job.fundEscrow(escrow.account, formattedAmount)
@@ -154,7 +154,7 @@ export class Job extends JobReads {
     return true 
   }
 
-  async addTrustedHandlers(handlers: Array<Address>, escrowId?: EscrowId): Promise<Boolean> {
+  async addTrustedHandlers(handlers: Array<Address>): Promise<Boolean> {
     // add trusted handler from credential PK
     return true;
   }
@@ -181,10 +181,11 @@ export class Job extends JobReads {
     return true;
   }
 
-  async storeIntermediateResults(results: Results, pubKey: PublicKey): Promise<Boolean> {
-    // uploads to S3 the encrypted results
-    // calls intermediate results
-    // stores it this.intermediateResults = []
+  async storeIntermediateResults(results: Results, pubKey?: PublicKey): Promise<Boolean> {
+    const resultInfo = await upload(results, pubKey)
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeResults(this.escrowId, resultInfo.manifestUrl, resultInfo.manifestHash)
+    const record = await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "IntermediateStorage"})
+    this.storedIntermediateResults.push({manifestUrl: record.event.data[1].toHuman(), manifestHash: record.event.data[2].toHuman()})
     return true;
   }
 
