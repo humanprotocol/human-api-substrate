@@ -1,10 +1,10 @@
-import { Job, setup } from "../src/index";
+import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
 import { hash, getDecimals, formatDecimals } from '../src/utils/substrate'
 
 import should from "should";
-const assert = require("assert");
+const { assert } = require("chai");
 
 describe("job", async () => {
   let api: any;
@@ -12,6 +12,8 @@ describe("job", async () => {
   let alice: any;
   let bob: any;
   let charlie: any;
+  let dave: any;
+  let amountToSend: any;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
   const manifestHash = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
@@ -36,6 +38,8 @@ describe("job", async () => {
     alice = keyring.addFromUri("//Alice");
     bob = keyring.addFromUri("//Bob");
     charlie = keyring.addFromUri("//Charlie");
+    dave = keyring.addFromUri("//Dave")
+    amountToSend = formatDecimals(api, 10)
   });
 
   after(function () {
@@ -111,7 +115,6 @@ describe("job", async () => {
       manifest.recording_oracle_addr,
       new BN("5")
       );
-    const amountToSend = await formatDecimals(api, 10)
     const escrowBefore = await job.escrow();
     await job.fundEscrow(escrowBefore.account, amountToSend)    
     await job.cancel()
@@ -119,7 +122,7 @@ describe("job", async () => {
     mockData.end_time = escrow.end_time;
     mockData.account = escrow.account;
     mockData.status = "Cancelled"
-    assert.deepEqual(escrow, mockData, "escrow should be deleted");
+    assert.deepEqual(escrow, mockData, "escrow should be cancelled");
   });
   it("stores intermediate results then fetches them", async () => {
     const job = await Job.createEscrow(
@@ -135,5 +138,89 @@ describe("job", async () => {
     await job.storeIntermediateResults(results)
     const intermediateResults = await job.intermediateResults(0)
     assert.deepEqual(JSON.parse(intermediateResults), results, "intermediated results should have been stored and retrieved properly")
+  });
+  it("does a bulk payout no results and sets complete", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+      );
+
+      const escrowBefore = await job.escrow();
+      const balanceOfCharlieBefore = await api.query.system.account(charlie.address)
+      const balanceOfDaveBefore = await api.query.system.account(dave.address)
+
+      await job.fundEscrow(escrowBefore.account, amountToSend)    
+      const payout: Payouts = {
+        addresses: [charlie.address, dave.address],
+        amounts: [formatDecimals(api, 5), formatDecimals(api, 5)]
+      }
+      await job.bulkPayout(payout)
+
+      const escrow = await job.escrow();
+      const balanceOfCharlieAfter = await api.query.system.account(charlie.address)
+      const balanceOfDaveAfter = await api.query.system.account(dave.address)
+      const balanceOfPalletAfter = await job.balance()
+
+      assert.isAbove(Number(balanceOfCharlieAfter.data.free), Number(balanceOfCharlieBefore.data.free), "charlie should ")
+      assert.isAbove(Number(balanceOfDaveAfter.data.free), Number(balanceOfDaveBefore.data.free), "charlie should ")
+      assert(balanceOfPalletAfter.isZero())
+
+      mockData.end_time = escrow.end_time;
+      mockData.account = escrow.account;
+      mockData.status = "Paid"
+      assert.deepEqual(escrow, mockData, "escrow should be paid");
+
+      await job.complete()
+      const completedEscrow = await job.escrow();
+      mockData.status = "Complete"
+      assert.deepEqual(completedEscrow, mockData, "escrow should be paid");
+  });
+  it("does a bulk payout with results not full payout", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+      );
+
+      const escrowBefore = await job.escrow();
+      const balanceOfCharlieBefore = await api.query.system.account(charlie.address)
+      const balanceOfDaveBefore = await api.query.system.account(dave.address)
+      const balanceOfJobBefore = await job.balance()
+
+      await job.fundEscrow(escrowBefore.account, amountToSend)    
+      const payout: Payouts = {
+        addresses: [charlie.address, dave.address],
+        amounts: [formatDecimals(api, 3), formatDecimals(api, 3)]
+      }
+
+      const finalResults =  { results: "final" }
+
+      await job.bulkPayout(payout, finalResults)
+
+      const escrow = await job.escrow();
+      const balanceOfCharlieAfter = await api.query.system.account(charlie.address)
+      const balanceOfDaveAfter = await api.query.system.account(dave.address)
+      const balanceOfJobAfter = await job.balance()
+
+      assert.isAbove(Number(balanceOfCharlieAfter.data.free), Number(balanceOfCharlieBefore.data.free), "charlie should ")
+      assert.isAbove(Number(balanceOfDaveAfter.data.free), Number(balanceOfDaveBefore.data.free), "charlie should ")
+      assert.isBelow(Number(balanceOfJobBefore), Number(balanceOfJobAfter), "job should have less funds")
+
+      mockData.end_time = escrow.end_time;
+      mockData.account = escrow.account;
+      mockData.status = "Partial"
+      assert.deepEqual(escrow, mockData, "escrow should be partial");
+
+      const finalResultReturrn = await job.finalResults()
+      assert.deepEqual(JSON.parse(finalResultReturrn), finalResults, "final results should have been stored and retrieved properly") 
   });
 });

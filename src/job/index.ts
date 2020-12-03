@@ -1,8 +1,8 @@
 import { ApiPromise, Keyring, SubmittableResult } from '@polkadot/api'
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Payouts } from '../interfaces'
 import BN from 'bn.js';
+import { Payouts } from '../interfaces'
 import { EscrowId, Address, PublicKey, Results, Status, Hash, Url, PrivateKey, Manifest, Stake, Amount } from '../types'
 import { sendAndWaitFor, formatDecimals } from '../utils/substrate';
 import { upload, download } from '../storage'
@@ -140,7 +140,7 @@ export class Job extends JobReads {
       .then((record) => {
         // The first element in the `Pending` event is the escrow id.
         // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(record.event.data[0].toString());
+        const id: EscrowId | any = record ? new BN(record.event.data[0].toString()) :  new Error("failed transaction")
         return id;
       })
       .then((id: EscrowId) => {
@@ -160,12 +160,18 @@ export class Job extends JobReads {
   }
 
   async bulkPayout(
-    payouts: Array<Payouts>,
-    results: Results,
-    pubKey: PublicKey,
+    payouts: Payouts,
+    results?: Results,
+    pubKey?: PublicKey,
   ): Promise<Boolean> {
-    // uploads results to url
-    // calls bulk payout batched with upload function
+    let resultInfo
+    if (results) {
+       resultInfo = await upload(results, pubKey)
+       this.finalUrl = resultInfo.url
+       // push final url onto global results
+    }
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.bulkPayout(this.escrowId, payouts.addresses, payouts.amounts, resultInfo?.url, resultInfo?.hash, "1")
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "BulkPayout"})
     return true;
   }
 
@@ -185,12 +191,13 @@ export class Job extends JobReads {
     const resultInfo = await upload(results, pubKey)
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeResults(this.escrowId, resultInfo.url, resultInfo.hash)
     const record = await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "IntermediateStorage"})
-    this.storedIntermediateResults.push({url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman()})
+    this.storedIntermediateResults.push({url: record?.event.data[1].toHuman(), hash: record?.event.data[2].toHuman()})
     return true;
   }
 
   async complete(): Promise<Boolean> {
-    // sets state to complete
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender)
     return true;
   }
 }

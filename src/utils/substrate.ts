@@ -41,8 +41,8 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
  * @param sender the sender of the transaction
  * @param filter which event to filter for
  */
-export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}): Promise<EventRecord> {
-	return new Promise<EventRecord>((resolve, reject) => {
+export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord | null> {
+	return new Promise<EventRecord | null>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -59,10 +59,12 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 				reject(dispatchError)
 			}
 			if (status.isInBlock || status.isFinalized) {
-				const record = res.findRecord(filter.section, filter.name);
+				const record = filter ? res.findRecord(filter.section, filter.name) : null
 				if (record) {
 					resolve(record)
-				} else {
+				} else if (!filter) {
+					resolve(null)
+				 } else {
 					reject(Error("EventRecord not found"))
 				}
 			}

@@ -21,8 +21,8 @@ describe('Job reads', async () => {
 		const charlie = keyring.addFromUri('//Charlie')
         const manifestUrl = "some.url"
         const manifestHash = "0xdev"
-		await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, new BN(10));
-		jobRead = new JobReads(api, new BN(0))
+		const job = await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, new BN(10));
+		jobRead = new JobReads(api, job.escrowId)
 	})
 	after(function(){
 		api.disconnect()
@@ -40,7 +40,7 @@ describe('Job reads', async () => {
 			reputation_oracle_stake: 10,
 			recording_oracle_stake: 10,
 			canceller: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-			account: '5EYCAe5gXcgQAJdw4eseCoYET15TMwKh4GV6cZv8vjPNZk4n'
+			account: escrow.account
 		  }
 
 		  assert.deepEqual(escrow, mockData, "escrow should match mock data")
