@@ -1,5 +1,7 @@
 import { Job, setup, JobReads } from '../src/index';
 import BN from 'bn.js';
+import manifest from '../example-manifest.json'
+import should from 'should'
 const assert = require('assert');
 
 describe('Job reads', async () => {
@@ -7,7 +9,8 @@ describe('Job reads', async () => {
 	let keyring: any
 	let jobRead: any
 	let alice: any
-	
+	const manifestUrl = 'https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5'
+
 	before(async function(){
         let obj = await setup()
         api = obj.api
@@ -18,8 +21,8 @@ describe('Job reads', async () => {
 		const charlie = keyring.addFromUri('//Charlie')
         const manifestUrl = "some.url"
         const manifestHash = "0xdev"
-		await Job.createEscrow(api, keyring, alice, manifestUrl, manifestHash, bob.address, charlie.address, 10);
-		jobRead = new JobReads(api, new BN(0))
+		const job = await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, new BN(10));
+		jobRead = new JobReads(api, job.escrowId)
 	})
 	after(function(){
 		api.disconnect()
@@ -37,7 +40,7 @@ describe('Job reads', async () => {
 			reputation_oracle_stake: 10,
 			recording_oracle_stake: 10,
 			canceller: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-			account: '5EYCAe5gXcgQAJdw4eseCoYET15TMwKh4GV6cZv8vjPNZk4n'
+			account: escrow.account
 		  }
 
 		  assert.deepEqual(escrow, mockData, "escrow should match mock data")
@@ -59,4 +62,36 @@ describe('Job reads', async () => {
 		assert.equal(isDaveTrusted, false)
 
 	})
+
+	it(`queries manifest`, async () => {
+		// assumes proper manifest url already stored in S3 bucket. 
+		// If fails, call storage, grab the proper url and try again
+		const result = await jobRead.manifest(manifestUrl)
+		assert.equal(result, JSON.stringify(manifest), "should retrieve manifest")
+
+	})
+
+	it(`fails to query intermediate results out of bounds`, async () => {
+		try {
+			await jobRead.intermediateResults(0)
+			should.fail('no error was thrown when it should have been', "")
+		} catch (e) {
+			assert.equal(
+				e.message, 
+				"Intermediate Results out of bounds"
+			)
+		}
+	})
+	it(`fails to query final results no final results yet`, async () => {
+		try {
+			await jobRead.finalResults()
+			should.fail('no error was thrown when it should have been', "")
+		} catch (e) {
+			assert.equal(
+				e.message, 
+				"No final results"
+			)
+		}
+	})
+
 })

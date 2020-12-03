@@ -1,20 +1,24 @@
 import { ApiPromise, Keyring, SubmittableResult } from '@polkadot/api'
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { Payouts } from '../interfaces'
 import BN from 'bn.js';
-import { EscrowId, Address, PublicKey, Results, Status, ManifestHash, ManifestUrl, PrivateKey, Manifest } from '../types'
-import { sendAndWaitFor } from '../utils/substrate';
+import { Payouts } from '../interfaces'
+import { EscrowId, Address, PublicKey, Results, Status, Hash, Url, PrivateKey, Manifest, Stake, Amount } from '../types'
+import { sendAndWaitFor, formatDecimals } from '../utils/substrate';
+import { upload, download } from '../storage'
 
 //TODO split these classes up into dedicated files
 
 export class JobReads { 
 	api: ApiPromise;
-	escrowId: EscrowId
-	
+	escrowId: EscrowId;
+	finalUrl: Manifest;
+	storedIntermediateResults: any;
+
 	constructor (api: ApiPromise, escrowId: EscrowId) {
 		this.api = api
 		this.escrowId = escrowId
+		this.storedIntermediateResults = []
 	}
 
 	async escrow(): Promise<any> {
@@ -45,57 +49,68 @@ export class JobReads {
 	/**
 	 * @param privKey private key of user who encrypted manifest
 	 * @param manifestUrl The url of the manifest to return
-	 * @returns the plain text manifest if can't decrypt 
+	 * @returns the plain text manifest or error if can't decrypt 
 	 */
-	async manifest(manifestUrl: ManifestUrl, privKey?: PrivateKey): Promise<Manifest | boolean> {
-		// call download()
-		// return manifest
+	async manifest(url: Url, privKey?: PrivateKey): Promise<Manifest> {
+		return download(url, privKey)
 	}
 	/**
 	 * 
 	 * @param privKey Private Key of encrypted data
 	 * @param index index of intermediate result to get
-	 * @returns The manifest or false if can't decrypt 
+	 * @returns The manifest or error if can't decrypt 
 	 */
-	async intermediateResults(index: Number, privKey?: PrivateKey): Promise<Manifest | boolean> {
-		// handle  intermediate results
-		// get the intermediate result at index
-		// calls manifest with it
+	public async intermediateResults(index: any, privKey?: PrivateKey): Promise<Manifest> {
+    if (!this.storedIntermediateResults[index]) {
+      throw new Error("Intermediate Results out of bounds")
+    }
+    // TODO test this when able to (writes complete)
+		return this.manifest(this.storedIntermediateResults[index].url, privKey)
 	}
 	
 	/**
 	 * 
 	 * @param privKey Private Key of encrypted data
-	 * @returns The manifest or false if can't decrypt 
+	 * @returns The manifest, error if can't decrypt error if no final results
 	 */
-	async finalResults(privKey?: PrivateKey): Promise<Manifest | Boolean> {
-		// call manifest with final result
+	public async finalResults(privKey?: PrivateKey): Promise<Manifest> {
+    if (this.finalUrl) {
+      //TODO test this case after writes are able to demo
+      return this.manifest(this.finalUrl, privKey)
+    } 
+    throw new Error("No final results")
 	}
 }
 
 export class Job extends JobReads {
-  keyring: Keyring;
+  sender: KeyringPair;
+  finalUrl: Url | null;
+  storedIntermediateResults: any;
+  amount: BN | null;
 
-  constructor(api: ApiPromise, escrowId: EscrowId, keyring: Keyring) {
+  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
     super(api, escrowId);
-    this.keyring = keyring;
+    this.sender = sender;
+    this.finalUrl = null;
+    this.amount = null
   }
 
-  static async launch(): Promise<Boolean> {
-	// calls upload returns hash and url
-	// get info from manifest
-    // reputation_oracle_stake from manifest (make sure it is in right format)
-    // recording_oracle_stake from manifest (make sure it is in right format)
-    // amount int(int(manifest["job_total_tasks"]) * Decimal(manifest["task_bid_price"]))
-    // hmt amount is amount 1e18 (now 1e12 or we change chain decimals)
-    // creates escrow()
-    return true;
+  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest, pubKey?: PublicKey): Promise<Job> {
+    const reputationOracle = manifest.reputation_oracle_addr
+    const recordingOracle = manifest.recording_oracle_addr
+    const oracleStake = new BN(manifest.oracle_stake * 100)
+    const amount = manifest.job_total_tasks * manifest.task_bid_price
+    const formattedAmount = formatDecimals(api, amount)
+    const manifestInfo = await upload(manifest, pubKey) 
+    const job = await this.createEscrow(api, sender, manifestInfo.url, manifestInfo.hash, reputationOracle, recordingOracle, oracleStake)
+    const escrow = await job.escrow()
+    await job.fundEscrow(escrow.account, formattedAmount)
+    return job
   }
 
   /**
    * Create an escrow on chain and return a new Job instance to interact with.
    * @param api object for interacting with the chain
-   * @param keyring used for signing
    * @param sender sender of the transaction to create the escrow
    * @param manifestUrl 
    * @param manifestHash 
@@ -105,13 +120,12 @@ export class Job extends JobReads {
    */
   static async createEscrow(
     api: ApiPromise,
-    keyring: Keyring,
     sender: KeyringPair,
     manifestUrl: String,
     manifestHash: String,
     reputationOracle: Address,
     recordingOracle: Address,
-    oracleStake: Number
+    oracleStake: Stake
   ): Promise<Job> {
     const call: SubmittableExtrinsic<"promise"> = api.tx.escrow.create(
       manifestUrl,
@@ -126,54 +140,64 @@ export class Job extends JobReads {
       .then((record) => {
         // The first element in the `Pending` event is the escrow id.
         // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(Number(record.event.data[0].toString()));
+        const id: EscrowId | any = record ? new BN(record.event.data[0].toString()) :  new Error("failed transaction")
         return id;
       })
       .then((id: EscrowId) => {
-        return new Job(api, id, keyring);
+        return new Job(api, sender, id);
       });
   }
 
-  async addTrustedHandlers(handlers: Array<Address>, escrowId?: EscrowId): Promise<Boolean> {
+  async fundEscrow(escrowAddress: Address, amount: Amount): Promise<Boolean> {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount)
+    await sendAndWaitFor(this.api, call, this.sender, {section: "balances", name: "Transfer"})
+    return true 
+  }
+
+  async addTrustedHandlers(handlers: Array<Address>): Promise<Boolean> {
     // add trusted handler from credential PK
     return true;
   }
 
   async bulkPayout(
-    payouts: Array<Payouts>,
-    results: Results,
-    pubKey: PublicKey,
-    escrowId?: EscrowId
+    payouts: Payouts,
+    results?: Results,
+    pubKey?: PublicKey,
   ): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
-    // uploads results to url
-    // calls bulk payout batched with upload function
+    let resultInfo
+    if (results) {
+       resultInfo = await upload(results, pubKey)
+       this.finalUrl = resultInfo.url
+       // push final url onto global results
+    }
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.bulkPayout(this.escrowId, payouts.addresses, payouts.amounts, resultInfo?.url, resultInfo?.hash, "1")
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "BulkPayout"})
     return true;
   }
 
-  async abort(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
-    // calls abort from original gas payer
+  async abort(): Promise<Boolean> {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "balances", name: "Transfer"})
     return true;
   }
 
-  async cancel(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
-    // calls cancel from original gas payer
+  async cancel(): Promise<Boolean> {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender,  {section: "balances", name: "Transfer"})
     return true;
   }
 
-  async storeIntermediateResults(results: Results, pubKey: PublicKey, escrowId?: EscrowId): Promise<Boolean> {
-    // uploads to S3 the encrypted results
-    // if escrow Id use, if not use this.escrowId
-    // calls intermediate results
-    // stores it this.intermediateResults = []
+  async storeIntermediateResults(results: Results, pubKey?: PublicKey): Promise<Boolean> {
+    const resultInfo = await upload(results, pubKey)
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeResults(this.escrowId, resultInfo.url, resultInfo.hash)
+    const record = await sendAndWaitFor(this.api, call, this.sender,  {section: "escrow", name: "IntermediateStorage"})
+    this.storedIntermediateResults.push({url: record?.event.data[1].toHuman(), hash: record?.event.data[2].toHuman()})
     return true;
   }
 
-  async complete(escrowId?: EscrowId): Promise<Boolean> {
-    // if escrow Id use, if not use this.escrowId
-    // sets state to complete
+  async complete(): Promise<Boolean> {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId)
+    await sendAndWaitFor(this.api, call, this.sender)
     return true;
   }
 }

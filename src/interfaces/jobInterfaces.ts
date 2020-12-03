@@ -1,25 +1,25 @@
-import {PrivateKey, Address, ManifestHash, ManifestUrl, Status, EndTime} from '../types'
+import {PrivateKey, Address, Amount, Hash, Url, Status, EndTime} from '../types'
 
 export interface Credentials {
 	gasPayer: Address
 	gasPayerPriv: PrivateKey
 }
 
-export interface ManifestInfo {
-	manifestHash: ManifestHash, 
-	manifestUrl: ManifestUrl
+export interface StorageInfo {
+	hash: Hash, 
+	url: Url
 }
 
 export interface Payouts {
-	to: Address, 
-	Amount: Number
+	addresses: Array<Address>
+	amounts: Array<Amount>
 }
 
 export interface EscrowInfo {
 	status: Status,
 	end_time: EndTime,
-  	manifest_url: ManifestUrl,
-	manifest_hash: ManifestHash,
+  	manifest_url: Url,
+	manifest_hash: Hash,
 	reputation_oracle: Address,
 	recording_oracle: Address,
 	reputation_oracle_stake: Number,

@@ -1,9 +1,10 @@
 import { Keyring } from '@polkadot/keyring'
-import { PrivateKey, Address, Account, Decimals } from '../types'
+import { PrivateKey, Address, Account, Decimals, Amount } from '../types'
 import { ApiPromise, SubmittableResult } from '@polkadot/api'
 import { EventRecord } from '@polkadot/types/interfaces/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import { blake2AsHex } from '@polkadot/util-crypto'
+import BN from 'bn.js';
 
 /**
  * @param privateKey Private key of contract launcher
@@ -25,9 +26,13 @@ export const privateKeyToAccount = (privateKey: PrivateKey): Account => {
 	return keyring.addFromSeed(privateKey)
 }
 
-export const getDecimals = (api: ApiPromise): Decimals => {
+export const getDecimals = (api: ApiPromise): number => {
 	return api.registry.chainDecimals
 }
+
+export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
+	return new BN(amount * (10 ** getDecimals(api)))
+} 
 
 /**
  * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`.
@@ -36,8 +41,8 @@ export const getDecimals = (api: ApiPromise): Decimals => {
  * @param sender the sender of the transaction
  * @param filter which event to filter for
  */
-export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}): Promise<EventRecord> {
-	return new Promise<EventRecord>((resolve, reject) => {
+export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord | null> {
+	return new Promise<EventRecord | null>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -54,10 +59,12 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 				reject(dispatchError)
 			}
 			if (status.isInBlock || status.isFinalized) {
-				const record = res.findRecord(filter.section, filter.name);
+				const record = filter ? res.findRecord(filter.section, filter.name) : null
 				if (record) {
 					resolve(record)
-				} else {
+				} else if (!filter) {
+					resolve(null)
+				 } else {
 					reject(Error("EventRecord not found"))
 				}
 			}
