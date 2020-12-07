@@ -41,8 +41,8 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
  * @param sender the sender of the transaction
  * @param filter which event to filter for
  */
-export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord | null> {
-	return new Promise<EventRecord | null>((resolve, reject) => {
+export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord> {
+	return new Promise<EventRecord>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -62,11 +62,39 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 				const record = filter ? res.findRecord(filter.section, filter.name) : null
 				if (record) {
 					resolve(record)
-				} else if (!filter) {
-					resolve(null)
-				 } else {
+				} else {
 					reject(Error("EventRecord not found"))
 				}
+			}
+		})
+	})
+}
+
+/**
+ * Signs and sends the given `call` from `sender` and waits for the transaction to be included in a block.
+ * @param api api object
+ * @param call a call that can be submitted to the chain
+ * @param sender the sender of the transaction
+ */
+export function sendAndWait<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account): Promise<undefined> {
+	return new Promise<undefined>((resolve, reject) => {
+		call.signAndSend(sender, (res: SubmittableResult) => {
+			const { status, dispatchError } = res
+			if (dispatchError) {
+				if (dispatchError.isModule) {
+					// for module errors, we have the section indexed, lookup
+					const decoded = api.registry.findMetaError(dispatchError.asModule);
+					const { documentation, name, section } = decoded;
+			
+					console.error(`${section}.${name}: ${documentation.join(' ')}`);
+				} else {
+					// Other, CannotLookup, BadOrigin, no extra info
+					console.error(dispatchError.toString());
+				}
+				reject(dispatchError)
+			}
+			if (status.isInBlock) {
+				resolve(undefined)
 			}
 		})
 	})
