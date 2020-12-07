@@ -1,3 +1,3 @@
 import {upload, download} from './storage'
 
-export {upload, download}
+export {upload, download} 
