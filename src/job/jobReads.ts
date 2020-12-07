@@ -7,7 +7,7 @@ import { createType } from "@polkadot/types";
 export default class JobReads {
   api: ApiPromise;
   escrowId: EscrowId;
-  storedIntermediateResults: any;
+  storedIntermediateResults: any[];
 
   constructor(api: ApiPromise, escrowId: EscrowId) {
     this.api = api;

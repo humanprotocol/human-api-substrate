@@ -10,13 +10,10 @@ import JobReads from "./jobReads";
 
 export default class Job extends JobReads {
   sender: KeyringPair;
-  storedIntermediateResults: any;
-  amount: BN | null;
 
   constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
     super(api, escrowId);
     this.sender = sender;
-    this.amount = null;
   }
 
   static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest, pubKey?: PublicKey): Promise<Job> {
