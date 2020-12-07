@@ -27,9 +27,9 @@ export default class JobReads {
    * @dev Retrieves if the address is a trusted handler from the escrow instance
    */
   async isTrustedHandler(address: Address): Promise<boolean> {
-	const isTrustedHander = await this.api.query.escrow.trustedHandlers(this.escrowId, address.toString());
-	let trusted = this.api.createType("bool", isTrustedHander)
-    return trusted.valueOf()
+    const isTrustedHander = await this.api.query.escrow.trustedHandlers(this.escrowId, address.toString());
+    let trusted = this.api.createType("bool", isTrustedHander);
+    return trusted.valueOf();
   }
 
   /**
@@ -70,8 +70,8 @@ export default class JobReads {
    */
   public async finalResults(privKey?: PrivateKey): Promise<any> {
     //TODO get proper type from polkadot js
-	const finalResultsOption: any = await this.api.query.escrow.finalResults(this.escrowId);
-	const finalResults = finalResultsOption.unwrap()
+    const finalResultsOption: any = await this.api.query.escrow.finalResults(this.escrowId);
+    const finalResults = finalResultsOption.unwrap();
     return this.manifest(finalResults.results_url.toHuman(), privKey);
   }
 }
