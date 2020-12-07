@@ -1,8 +1,7 @@
 require('dotenv').config()
 import setup from './utils/setup'
-import {JobReads, Job} from './job'
+import {Job, JobReads} from './job'
 
-
-export { setup, JobReads, Job }
+export { setup, Job, JobReads }
 export * from './interfaces'
 export * from './types'
