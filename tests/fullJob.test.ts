@@ -233,7 +233,6 @@ describe("job", async () => {
     assert.deepEqual(escrow, mockData, "escrow should be partial");
 
     const finalResultReturn = await job.finalResults();
-    console.log({ finalResultReturn });
     assert.deepEqual(
       JSON.parse(finalResultReturn),
       finalResults,
