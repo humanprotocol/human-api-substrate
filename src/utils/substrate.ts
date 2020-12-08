@@ -94,7 +94,7 @@ export function sendAndWait(api: ApiPromise, call: SubmittableExtrinsic<'promise
 				}
 				reject(dispatchError)
 			}
-			if (status.isInBlock) {
+			if (status.isInBlock || status.isFinalized) {
 				resolve(undefined)
 			}
 		})
