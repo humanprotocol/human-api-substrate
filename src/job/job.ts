@@ -33,7 +33,8 @@ export default class Job extends JobReads {
       oracleStake
     );
     const escrow = await job.escrow();
-    await job.fundEscrow(escrow.account, formattedAmount);
+    await job.fundEscrow(escrow.account, formattedAmount)
+        .catch((e) => {throw new Error(`Escrow ${job.escrowId} created but not funded: '${e.message}'`)});
     return job;
   }
 
@@ -63,18 +64,10 @@ export default class Job extends JobReads {
       recordingOracle,
       oracleStake,
       oracleStake
-    );
-
-    return sendAndWaitFor(api, call, sender, { section: "escrow", name: "Pending" })
-      .then((record) => {
-        // The first element in the `Pending` event is the escrow id.
-        // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(record.event.data[0].toString());
-        return id;
-      })
-      .then((id: EscrowId) => {
-        return new Job(api, sender, id);
-      });
+    ); 
+     const record = await sendAndWaitFor(api, call, sender, { section: "escrow", name: "Pending" }).catch((e) => {throw new Error(e.message)});
+     const id: EscrowId = new BN(record.event.data[0].toString());
+     return new Job(api, sender, id);
   }
 
   async fundEscrow(escrowAddress: Address, amount: Amount) {
@@ -83,8 +76,8 @@ export default class Job extends JobReads {
   }
 
   async addTrustedHandlers(handlers: Array<Address>) {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
-    await sendAndWait(this.api, call, this.sender);
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers)
+    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});
   }
 
   async bulkPayout(payouts: Payouts) {
@@ -93,7 +86,7 @@ export default class Job extends JobReads {
       payouts.addresses,
       payouts.amounts
     );
-    await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" }).catch((e) => {throw new Error(e.message)});
   }
 
   async storeFinalResults(results: Results, pubKey?: PublicKey) {
@@ -103,17 +96,18 @@ export default class Job extends JobReads {
       resultInfo.url,
       resultInfo.hash
     );
-    await sendAndWait(this.api, call, this.sender);
+    await sendAndWait(this.api, call, this.sender)
+        .catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
   }
 
   async abort() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
   }
 
   async cancel() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
   }
 
   async noteIntermediateResults(results: Results, pubKey?: PublicKey) {
@@ -126,12 +120,12 @@ export default class Job extends JobReads {
     const record = await sendAndWaitFor(this.api, call, this.sender, {
       section: "escrow",
       name: "IntermediateResults",
-    });
+    }).catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
     this.storedIntermediateResults.push({ url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman() });
   }
 
   async complete() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId);
-    await sendAndWait(this.api, call, this.sender);
+    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});;
   }
 }

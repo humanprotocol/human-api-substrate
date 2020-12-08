@@ -51,23 +51,21 @@ export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'prom
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
-					console.error(`${section}.${name}: ${documentation.join(' ')}`);
+					reject(Error(`${section}.${name}: ${documentation.join(' ')}`))
 				} else {
-					// Other, CannotLookup, BadOrigin, no extra info
-					console.error(dispatchError.toString());
+					reject(Error(dispatchError.toString()))
 				}
-				reject(dispatchError)
 			}
 			if (status.isInBlock || status.isFinalized) {
 				const record = res.findRecord(filter.section, filter.name)
 				if (record) {
 					resolve(record)
 				} else {
-					reject(Error("EventRecord not found"))
+					reject(Error("Event record not found"))
 				}
 			}
-		})
+		}).catch((e) => {reject(Error(e.message))})
+	
 	})
 }
 
@@ -86,18 +84,15 @@ export function sendAndWait(api: ApiPromise, call: SubmittableExtrinsic<'promise
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
-					console.error(`${section}.${name}: ${documentation.join(' ')}`);
+					reject(Error(`${section}.${name}: ${documentation.join(' ')}`))
 				} else {
-					// Other, CannotLookup, BadOrigin, no extra info
-					console.error(dispatchError.toString());
+					reject(Error(dispatchError.toString()))
 				}
-				reject(dispatchError)
 			}
 			if (status.isInBlock || status.isFinalized) {
 				resolve(undefined)
 			}
-		})
+		}).catch((e) => {reject(Error(e.message))})
 	})
 }
 

@@ -3,7 +3,6 @@ import BN from "bn.js";
 import manifest from "../example-manifest.json";
 import { hash, getDecimals, formatDecimals } from "../src/utils/substrate";
 
-import should from "should";
 const { assert } = require("chai");
 
 describe("job", async () => {
