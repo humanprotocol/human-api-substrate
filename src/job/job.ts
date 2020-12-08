@@ -126,7 +126,7 @@ export default class Job extends JobReads {
     const record = await sendAndWaitFor(this.api, call, this.sender, {
       section: "escrow",
       name: "IntermediateResults",
-    }).catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain ${e.message}`)});;
+    }).catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
     this.storedIntermediateResults.push({ url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman() });
     return true;
   }
