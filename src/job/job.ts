@@ -77,29 +77,26 @@ export default class Job extends JobReads {
       });
   }
 
-  async fundEscrow(escrowAddress: Address, amount: Amount): Promise<Boolean> {
+  async fundEscrow(escrowAddress: Address, amount: Amount) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
     await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
-    return true;
   }
 
-  async addTrustedHandlers(handlers: Array<Address>): Promise<Boolean> {
+  async addTrustedHandlers(handlers: Array<Address>) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
     await sendAndWait(this.api, call, this.sender);
-    return true;
   }
 
-  async bulkPayout(payouts: Payouts): Promise<Boolean> {
+  async bulkPayout(payouts: Payouts) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.bulkPayout(
       this.escrowId,
       payouts.addresses,
       payouts.amounts
     );
     await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" });
-    return true;
   }
 
-  async storeFinalResults(results: Results, pubKey?: PublicKey): Promise<Boolean> {
+  async storeFinalResults(results: Results, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeFinalResults(
       this.escrowId,
@@ -107,22 +104,19 @@ export default class Job extends JobReads {
       resultInfo.hash
     );
     await sendAndWait(this.api, call, this.sender);
-    return true;
   }
 
-  async abort(): Promise<Boolean> {
+  async abort() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId);
     await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
-    return true;
   }
 
-  async cancel(): Promise<Boolean> {
+  async cancel() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId);
     await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
-    return true;
   }
 
-  async noteIntermediateResults(results: Results, pubKey?: PublicKey): Promise<Boolean> {
+  async noteIntermediateResults(results: Results, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.noteIntermediateResults(
       this.escrowId,
@@ -134,12 +128,10 @@ export default class Job extends JobReads {
       name: "IntermediateResults",
     });
     this.storedIntermediateResults.push({ url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman() });
-    return true;
   }
 
-  async complete(): Promise<Boolean> {
+  async complete() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId);
     await sendAndWait(this.api, call, this.sender);
-    return true;
   }
 }
