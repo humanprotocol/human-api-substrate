@@ -98,7 +98,8 @@ export default class Job extends JobReads {
       resultInfo.url,
       resultInfo.hash
     );
-    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain ${e.message}`)});;
+    await sendAndWait(this.api, call, this.sender)
+        .catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
     return true;
   }
 
