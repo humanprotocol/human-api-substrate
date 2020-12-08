@@ -109,7 +109,7 @@ describe("failing job", async () => {
 		);
 	   should.fail("no error was thrown when it should have been", "");
 	  } catch (e) {
-		assert.equal(e.message, `Escrow ${currentEscrow.toString()} create but not funded balances.InsufficientBalance:  Balance too low to send value`);
+		assert.equal(e.message, `Escrow ${currentEscrow.toString()} created but not funded: 'balances.InsufficientBalance:  Balance too low to send value'`);
 	  }
 	  manifest.task_bid_price = "0.000064"
   })
@@ -196,7 +196,7 @@ describe("failing job", async () => {
 	   await bobJob.storeFinalResults(finalResults);
 	   should.fail("no error was thrown when it should have been", "");
 	  } catch (e) {
-		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
+		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`);
 	  }
   })
   it("fails to abort", async () => {
@@ -263,7 +263,7 @@ describe("failing job", async () => {
 	   await bobJob.noteIntermediateResults(finalResults);
 	   should.fail("no error was thrown when it should have been", "");
 	  } catch (e) {
-		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
+		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`);
 	  }
   })
   it("fails to complete", async () => {
