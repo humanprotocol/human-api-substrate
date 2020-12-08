@@ -41,8 +41,8 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
  * @param sender the sender of the transaction
  * @param filter which event to filter for
  */
-export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord> {
-	return new Promise<EventRecord> ((resolve, reject) => {
+export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}): Promise<EventRecord> {
+	return new Promise<EventRecord>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -56,7 +56,7 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 				}
 			}
 			if (status.isInBlock || status.isFinalized) {
-				const record = filter ? res.findRecord(filter.section, filter.name) : null
+				const record = res.findRecord(filter.section, filter.name)
 				if (record) {
 					resolve(record)
 				} else {
@@ -74,7 +74,7 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
  * @param call a call that can be submitted to the chain
  * @param sender the sender of the transaction
  */
-export function sendAndWait<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account): Promise<undefined> {
+export function sendAndWait(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account): Promise<undefined> {
 	return new Promise<undefined>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
