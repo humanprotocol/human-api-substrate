@@ -5,6 +5,7 @@ import { EventRecord } from '@polkadot/types/interfaces/types'
 import { SubmittableExtrinsic } from '@polkadot/api/types'
 import { blake2AsHex } from '@polkadot/util-crypto'
 import BN from 'bn.js';
+import { EventFilter } from '../interfaces'
 
 /**
  * @param privateKey Private key of contract launcher
@@ -41,7 +42,7 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
  * @param sender the sender of the transaction
  * @param filter which event to filter for
  */
-export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: { section: string, name: string}): Promise<EventRecord> {
+export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter: EventFilter): Promise<EventRecord> {
 	return new Promise<EventRecord>((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
@@ -88,7 +89,7 @@ export function sendAndWait(api: ApiPromise, call: SubmittableExtrinsic<'promise
 					reject(Error(dispatchError.toString()))
 				}
 			}
-			if (status.isInBlock) {
+			if (status.isInBlock || status.isFinalized) {
 				resolve(undefined)
 			}
 		}).catch((e) => {reject(Error(e.message))})
