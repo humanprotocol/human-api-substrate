@@ -60,7 +60,7 @@ export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'prom
 				if (record) {
 					resolve(record)
 				} else {
-					reject(Error("Event Record not found"))
+					reject(Error("Event record not found"))
 				}
 			}
 		}).catch((e) => {reject(Error(e.message))})
