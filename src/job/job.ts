@@ -63,29 +63,21 @@ export default class Job extends JobReads {
       recordingOracle,
       oracleStake,
       oracleStake
-    );
-
-    return sendAndWaitFor(api, call, sender, { section: "escrow", name: "Pending" })
-      .then((record) => {
-        // The first element in the `Pending` event is the escrow id.
-        // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(record.event.data[0].toString());
-        return id;
-      })
-      .then((id: EscrowId) => {
-        return new Job(api, sender, id);
-      });
+    ); 
+     const record = await sendAndWaitFor(api, call, sender, { section: "escrow", name: "Pending" }).catch((e) => {throw new Error(e.message)});
+     const id: EscrowId = new BN(record.event.data[0].toString());
+     return new Job(api, sender, id);
   }
 
   async fundEscrow(escrowAddress: Address, amount: Amount): Promise<Boolean> {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});
     return true;
   }
 
   async addTrustedHandlers(handlers: Array<Address>): Promise<Boolean> {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
-    await sendAndWait(this.api, call, this.sender);
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers)
+    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 
@@ -95,7 +87,7 @@ export default class Job extends JobReads {
       payouts.addresses,
       payouts.amounts
     );
-    await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" }).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 
@@ -106,19 +98,19 @@ export default class Job extends JobReads {
       resultInfo.url,
       resultInfo.hash
     );
-    await sendAndWait(this.api, call, this.sender);
+    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 
   async abort(): Promise<Boolean> {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 
   async cancel(): Promise<Boolean> {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 
@@ -132,14 +124,14 @@ export default class Job extends JobReads {
     const record = await sendAndWaitFor(this.api, call, this.sender, {
       section: "escrow",
       name: "IntermediateResults",
-    });
+    }).catch((e) => {throw new Error(e.message)});;
     this.storedIntermediateResults.push({ url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman() });
     return true;
   }
 
   async complete(): Promise<Boolean> {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId);
-    await sendAndWait(this.api, call, this.sender);
+    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});;
     return true;
   }
 }

@@ -42,7 +42,7 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
  * @param filter which event to filter for
  */
 export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'promise'>, sender: Account, filter?: { section: string, name: string}): Promise<EventRecord> {
-	return new Promise<EventRecord>((resolve, reject) => {
+	return new Promise<EventRecord> ((resolve, reject) => {
 		call.signAndSend(sender, (res: SubmittableResult) => {
 			const { status, dispatchError } = res
 			if (dispatchError) {
@@ -50,23 +50,21 @@ export function sendAndWaitFor<R>(api: ApiPromise, call: SubmittableExtrinsic<'p
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
-					console.error(`${section}.${name}: ${documentation.join(' ')}`);
+					reject(Error(`${section}.${name}: ${documentation.join(' ')}`))
 				} else {
-					// Other, CannotLookup, BadOrigin, no extra info
-					console.error(dispatchError.toString());
+					reject(Error(dispatchError.toString()))
 				}
-				reject(dispatchError)
 			}
 			if (status.isInBlock || status.isFinalized) {
 				const record = filter ? res.findRecord(filter.section, filter.name) : null
 				if (record) {
 					resolve(record)
 				} else {
-					reject(Error("EventRecord not found"))
+					reject(Error("Event Record not found"))
 				}
 			}
-		})
+		}).catch((e) => {reject(Error(e.message))})
+	
 	})
 }
 
@@ -85,18 +83,15 @@ export function sendAndWait<R>(api: ApiPromise, call: SubmittableExtrinsic<'prom
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
-					console.error(`${section}.${name}: ${documentation.join(' ')}`);
+					reject(Error(`${section}.${name}: ${documentation.join(' ')}`))
 				} else {
-					// Other, CannotLookup, BadOrigin, no extra info
-					console.error(dispatchError.toString());
+					reject(Error(dispatchError.toString()))
 				}
-				reject(dispatchError)
 			}
 			if (status.isInBlock) {
 				resolve(undefined)
 			}
-		})
+		}).catch((e) => {reject(Error(e.message))})
 	})
 }
 
