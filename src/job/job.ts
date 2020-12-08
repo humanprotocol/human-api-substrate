@@ -33,7 +33,8 @@ export default class Job extends JobReads {
       oracleStake
     );
     const escrow = await job.escrow();
-    await job.fundEscrow(escrow.account, formattedAmount).catch((e) => {throw new Error(`Escrow ${job.escrowId} create but not funded ${e.message}`)});
+    await job.fundEscrow(escrow.account, formattedAmount)
+        .catch((e) => {throw new Error(`Escrow ${job.escrowId} created but not funded: '${e.message}'`)});
     return job;
   }
 
