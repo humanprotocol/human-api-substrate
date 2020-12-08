@@ -1,7 +1,7 @@
 import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
-import { hash, getDecimals, formatDecimals } from "../src/utils/substrate";
+import { hash, getDecimals, formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
 
 import should from "should";
 const { assert } = require("chai");
@@ -59,7 +59,8 @@ describe("failing job", async () => {
         manifest.reputation_oracle_addr,
         manifest.recording_oracle_addr,
         new BN("5")
-      );
+	  );
+	  should.fail("no error was thrown when it should have been", "");
     } catch (e) {
       assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
     }
@@ -74,6 +75,7 @@ describe("failing job", async () => {
 	const amountToSend = new BN(1)
 	try {
 		await job.fundEscrow(eve.address, amountToSend);
+		should.fail("no error was thrown when it should have been", "");
 	} catch (e) {
 		assert.equal(
 			e.message, 
@@ -81,4 +83,35 @@ describe("failing job", async () => {
 		)
 	}
   });
+  it("fails launch on create escrow", async () => {
+	try {
+		await Job.launch(
+		  api,
+		  eve,
+		  manifest
+		);
+		should.fail("no error was thrown when it should have been", "");
+	  } catch (e) {
+		assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
+	  }
+  })
+
+  it("fails launch on funding escrow", async () => {
+	  manifest.task_bid_price = "10"
+	  const call = api.tx.balances.transfer(dave.address, "100000000000000");
+	  await sendAndWaitFor(api, call, alice, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});
+	  const currentEscrow = await api.query.escrow.counter()
+	  try {
+		await Job.launch(
+		  api,
+		  dave,
+		  manifest
+		);
+	   should.fail("no error was thrown when it should have been", "");
+	  } catch (e) {
+		assert.equal(e.message, `Escrow ${currentEscrow.toString()} create but not funded balances.InsufficientBalance:  Balance too low to send value`);
+	  }
+	  manifest.task_bid_price = "0.000064"
+  })
+
 });
