@@ -38,7 +38,7 @@ export const upload = async (data: Manifest, pubKey?: string): Promise<StorageIn
   };
 };
 
-export const download = async (url: Url, privKey?: PrivateKey): Promise<Manifest> => {
+export const download = async (url: Url, privKey?: PrivateKey): Promise<string> => {
   // TODO handle decryption if privKey (throw error if no key)
   const s3UrlConstant = "s3.amazonaws.com/";
   const sliceAmount = url.indexOf(s3UrlConstant) + s3UrlConstant.length;
