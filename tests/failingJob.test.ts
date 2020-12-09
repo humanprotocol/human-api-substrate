@@ -1,7 +1,7 @@
 import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
-import { hash, getDecimals, formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
+import { formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
 
 import should from "should";
 const { assert } = require("chai");
@@ -33,7 +33,7 @@ describe("failing job", async () => {
   };
 
   before(async function () {
-    let obj = await setup();
+    const obj = await setup();
     api = obj.api;
     keyring = obj.keyring;
     alice = keyring.addFromUri("//Alice");
@@ -59,234 +59,246 @@ describe("failing job", async () => {
         manifest.reputation_oracle_addr,
         manifest.recording_oracle_addr,
         new BN("5")
-	  );
-	  should.fail("no error was thrown when it should have been", "");
+      );
+      should.fail("no error was thrown when it should have been", "");
     } catch (e) {
       assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
     }
   });
 
   it("funds escorow", async () => {
-    const job = new Job(
-      api,
-      alice,
-      new BN(1),
-    );
-	const amountToSend = new BN(1)
-	try {
-		await job.fundEscrow(eve.address, amountToSend);
-		should.fail("no error was thrown when it should have been", "");
-	} catch (e) {
-		assert.equal(
-			e.message, 
-			"balances.ExistentialDeposit:  Value too low to create account due to existential deposit"
-		)
-	}
+    const job = new Job(api, alice, new BN(1));
+    const amountToSend = new BN(1);
+    try {
+      await job.fundEscrow(eve.address, amountToSend);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        "balances.ExistentialDeposit:  Value too low to create account due to existential deposit"
+      );
+    }
   });
   it("fails launch on create escrow", async () => {
-	try {
-		await Job.launch(
-		  api,
-		  eve,
-		  manifest
-		);
-		should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
-	  }
-  })
+    try {
+      await Job.launch(api, eve, manifest);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
+    }
+  });
 
   it("fails launch on funding escrow", async () => {
-	  manifest.task_bid_price = "10"
-	  const call = api.tx.balances.transfer(dave.address, "100000000000000");
-	  await sendAndWaitFor(api, call, alice, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});
-	  const currentEscrow = await api.query.escrow.counter()
-	  try {
-		await Job.launch(
-		  api,
-		  dave,
-		  manifest
-		);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `Escrow ${currentEscrow.toString()} created but not funded: 'balances.InsufficientBalance:  Balance too low to send value'`);
-	  }
-	  manifest.task_bid_price = "0.000064"
-  })
+    manifest.task_bid_price = "10";
+    const call = api.tx.balances.transfer(dave.address, "100000000000000");
+    await sendAndWaitFor(api, call, alice, { section: "balances", name: "Transfer" }).catch((e) => {
+      throw new Error(e.message);
+    });
+    const currentEscrow = await api.query.escrow.counter();
+    try {
+      await Job.launch(api, dave, manifest);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `Escrow ${currentEscrow.toString()} created but not funded: 'balances.InsufficientBalance:  Balance too low to send value'`
+      );
+    }
+    manifest.task_bid_price = "0.000064";
+  });
   it("fails to add trusted handler", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
-  
-	  const handlers = [charlie.address, dave.address];
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  try {
-	   await bobJob.addTrustedHandlers(handlers);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
-	  }
-  
-  })
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
+
+    const handlers = [charlie.address, dave.address];
+    const bobJob = await new Job(api, bob, job.escrowId);
+    try {
+      await bobJob.addTrustedHandlers(handlers);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`
+      );
+    }
+  });
   it("fails to add trusted handler no money in account", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
-  
-	  const handlers = [charlie.address, dave.address];
-	  const eveJob = await new Job(api, eve, job.escrowId)
-	  try {
-	   await eveJob.addTrustedHandlers(handlers);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`);
-	  }
-  
-  })
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
+
+    const handlers = [charlie.address, dave.address];
+    const eveJob = await new Job(api, eve, job.escrowId);
+    try {
+      await eveJob.addTrustedHandlers(handlers);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(e.message, `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`);
+    }
+  });
   it("fails to bulk payout", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const payout: Payouts = {
-		addresses: [charlie.address, dave.address],
-		amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
-	  };
-	  try {
-	   await bobJob.bulkPayout(payout);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
-	  }
-  })
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const payout: Payouts = {
+      addresses: [charlie.address, dave.address],
+      amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
+    };
+    try {
+      await bobJob.bulkPayout(payout);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`
+      );
+    }
+  });
   it("fails to store final results", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const finalResults = { results: "final" };
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const finalResults = { results: "final" };
 
-	  try {
-	   await bobJob.storeFinalResults(finalResults);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`);
-	  }
-  })
+    try {
+      await bobJob.storeFinalResults(finalResults);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`
+      );
+    }
+  });
   it("fails to abort", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const payout: Payouts = {
-		addresses: [charlie.address, dave.address],
-		amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
-	  };
-	  try {
-	   await bobJob.abort();
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
-	  }
-  })
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const payout: Payouts = {
+      addresses: [charlie.address, dave.address],
+      amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
+    };
+    try {
+      await bobJob.abort();
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`
+      );
+    }
+  });
   it("fails to cancel", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const payout: Payouts = {
-		addresses: [charlie.address, dave.address],
-		amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
-	  };
-	  try {
-	   await bobJob.cancel();
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
-	  }
-  })
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const payout: Payouts = {
+      addresses: [charlie.address, dave.address],
+      amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
+    };
+    try {
+      await bobJob.cancel();
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`
+      );
+    }
+  });
   it("fails to store intermediate results", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const finalResults = { results: "final" };
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const finalResults = { results: "final" };
 
-	  try {
-	   await bobJob.noteIntermediateResults(finalResults);
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`);
-	  }
-  })
+    try {
+      await bobJob.noteIntermediateResults(finalResults);
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `Results stored at https://human-parity-is-the-best.s3.amazonaws.com/s30xbda0b7365646a7b7aba74e08fa6514cae947d9f5a9d5265d34741ee739eb1e68, but failed to post on blockchain: 'escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.'`
+      );
+    }
+  });
   it("fails to complete", async () => {
-	const job = await Job.createEscrow(
-		api,
-		alice,
-		manifestUrl,
-		manifestHash,
-		manifest.reputation_oracle_addr,
-		manifest.recording_oracle_addr,
-		new BN("5")
-	  );
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
 
-	  const bobJob = await new Job(api, bob, job.escrowId)
-	  const payout: Payouts = {
-		addresses: [charlie.address, dave.address],
-		amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
-	  };
-	  try {
-	   await bobJob.complete();
-	   should.fail("no error was thrown when it should have been", "");
-	  } catch (e) {
-		assert.equal(e.message, `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`);
-	  }
-  })
+    const bobJob = await new Job(api, bob, job.escrowId);
+    const payout: Payouts = {
+      addresses: [charlie.address, dave.address],
+      amounts: [formatDecimals(api, 3), formatDecimals(api, 3)],
+    };
+    try {
+      await bobJob.complete();
+      should.fail("no error was thrown when it should have been", "");
+    } catch (e) {
+      assert.equal(
+        e.message,
+        `escrow.NonTrustedAccount:  The account associated with the origin does not have the privilege for the operation.`
+      );
+    }
+  });
 });

@@ -1,22 +1,24 @@
-import { ApiPromise } from "@polkadot/api";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { KeyringPair } from "@polkadot/keyring/types";
-import BN from "bn.js";
-import { Payouts } from "../interfaces";
-import { EscrowId, Address, PublicKey, Results, Url, Manifest, Stake, Amount } from "../types";
-import { sendAndWaitFor, formatDecimals, sendAndWait } from "../utils/substrate";
-import { upload } from "../storage";
-import JobReads from "./jobReads";
+import BN from 'bn.js';
+
+import { ApiPromise } from '@polkadot/api';
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { KeyringPair } from '@polkadot/keyring/types';
+
+import { Payouts } from '../interfaces';
+import { upload } from '../storage';
+import { Address, Amount, EscrowId, Manifest, PublicKey, Results, Stake } from '../types';
+import { formatDecimals, sendAndWait, sendAndWaitFor } from '../utils/substrate';
+import JobReads from './jobReads';
 
 export default class Job extends JobReads {
   sender: KeyringPair;
 
-  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
+  constructor (api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
     super(api, escrowId);
     this.sender = sender;
   }
 
-  static async launch(api: ApiPromise, sender: KeyringPair, manifest: Manifest, pubKey?: PublicKey): Promise<Job> {
+  static async launch (api: ApiPromise, sender: KeyringPair, manifest: Manifest, pubKey?: PublicKey): Promise<Job> {
     const reputationOracle = manifest.reputation_oracle_addr;
     const recordingOracle = manifest.recording_oracle_addr;
     const oracleStake = new BN(manifest.oracle_stake * 100);
@@ -33,8 +35,11 @@ export default class Job extends JobReads {
       oracleStake
     );
     const escrow = await job.escrow();
-    await job.fundEscrow(escrow.account, formattedAmount)
-        .catch((e) => {throw new Error(`Escrow ${job.escrowId} created but not funded: '${e.message}'`)});
+
+    await job.fundEscrow(escrow.account, formattedAmount).catch((e) => {
+      throw new Error(`Escrow ${job.escrowId} created but not funded: '${e.message}'`);
+    });
+
     return job;
   }
 
@@ -48,84 +53,108 @@ export default class Job extends JobReads {
    * @param recordingOracle account id of the recording oracle
    * @param oracleStake oracle fees
    */
-  static async createEscrow(
+  static async createEscrow (
     api: ApiPromise,
     sender: KeyringPair,
-    manifestUrl: String,
-    manifestHash: String,
+    manifestUrl: string,
+    manifestHash: string,
     reputationOracle: Address,
     recordingOracle: Address,
     oracleStake: Stake
   ): Promise<Job> {
-    const call: SubmittableExtrinsic<"promise"> = api.tx.escrow.create(
+    const call: SubmittableExtrinsic<'promise'> = api.tx.escrow.create(
       manifestUrl,
       manifestHash,
       reputationOracle,
       recordingOracle,
       oracleStake,
       oracleStake
-    ); 
-     const record = await sendAndWaitFor(api, call, sender, { section: "escrow", name: "Pending" }).catch((e) => {throw new Error(e.message)});
-     const id: EscrowId = new BN(record.event.data[0].toString());
-     return new Job(api, sender, id);
+    );
+    const record = await sendAndWaitFor(api, call, sender, { section: 'escrow', name: 'Pending' }).catch((e) => {
+      throw new Error(e.message);
+    });
+    const id: EscrowId = new BN(record.event.data[0].toString());
+
+    return new Job(api, sender, id);
   }
 
-  async fundEscrow(escrowAddress: Address, amount: Amount) {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
+  async fundEscrow (escrowAddress: Address, amount: Amount) {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
+
+    await sendAndWaitFor(this.api, call, this.sender, { section: 'balances', name: 'Transfer' });
   }
 
-  async addTrustedHandlers(handlers: Array<Address>) {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers)
-    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});
+  async addTrustedHandlers (handlers: Array<Address>) {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
+
+    await sendAndWait(this.api, call, this.sender).catch((e) => {
+      throw new Error(e.message);
+    });
   }
 
-  async bulkPayout(payouts: Payouts) {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.bulkPayout(
+  async bulkPayout (payouts: Payouts) {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.bulkPayout(
       this.escrowId,
       payouts.addresses,
       payouts.amounts
     );
-    await sendAndWaitFor(this.api, call, this.sender, { section: "escrow", name: "BulkPayout" }).catch((e) => {throw new Error(e.message)});
+
+    await sendAndWaitFor(this.api, call, this.sender, { section: 'escrow', name: 'BulkPayout' }).catch((e) => {
+      throw new Error(e.message);
+    });
   }
 
-  async storeFinalResults(results: Results, pubKey?: PublicKey) {
+  async storeFinalResults (results: Results, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeFinalResults(
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.storeFinalResults(
       this.escrowId,
       resultInfo.url,
       resultInfo.hash
     );
-    await sendAndWait(this.api, call, this.sender)
-        .catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
+
+    await sendAndWait(this.api, call, this.sender).catch((e) => {
+      throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`);
+    });
   }
 
-  async abort() {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
+  async abort () {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.abort(this.escrowId);
+
+    await sendAndWaitFor(this.api, call, this.sender, { section: 'balances', name: 'Transfer' }).catch((e) => {
+      throw new Error(e.message);
+    });
   }
 
-  async cancel() {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(this.escrowId);
-    await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" }).catch((e) => {throw new Error(e.message)});;
+  async cancel () {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.cancel(this.escrowId);
+
+    await sendAndWaitFor(this.api, call, this.sender, { section: 'balances', name: 'Transfer' }).catch((e) => {
+      throw new Error(e.message);
+    });
   }
 
-  async noteIntermediateResults(results: Results, pubKey?: PublicKey) {
+  async noteIntermediateResults (results: Results, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.noteIntermediateResults(
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.noteIntermediateResults(
       this.escrowId,
       resultInfo.url,
       resultInfo.hash
     );
     const record = await sendAndWaitFor(this.api, call, this.sender, {
-      section: "escrow",
-      name: "IntermediateResults",
-    }).catch((e) => {throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`)});;
+      section: 'escrow',
+      name: 'IntermediateResults'
+    }).catch((e) => {
+      throw new Error(`Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`);
+    });
+
     this.storedIntermediateResults.push({ url: record.event.data[1].toHuman(), hash: record.event.data[2].toHuman() });
   }
 
-  async complete() {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(this.escrowId);
-    await sendAndWait(this.api, call, this.sender).catch((e) => {throw new Error(e.message)});;
+  async complete () {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.complete(this.escrowId);
+
+    await sendAndWait(this.api, call, this.sender).catch((e) => {
+      throw new Error(e.message);
+    });
   }
 }

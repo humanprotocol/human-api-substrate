@@ -31,7 +31,7 @@ describe("job", async () => {
   };
 
   before(async function () {
-    let obj = await setup();
+    const obj = await setup();
     api = obj.api;
     keyring = obj.keyring;
     alice = keyring.addFromUri("//Alice");
