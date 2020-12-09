@@ -5,19 +5,26 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -t 30000 -r ts-node/register 'tests/**/*.ts'",
-    "compile": "tsc",
     "generate": "yarn generate:defs && yarn generate:meta",
     "generate:defs": "ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package '.' --input ./src/typegen/src/interfaces",
-    "generate:meta": "ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --package '.' --endpoint ./src/typegen/hmt-metadata.json --output ./src/typegen/src/interfaces --strict"
+    "generate:meta": "ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --package '.' --endpoint ./src/typegen/hmt-metadata.json --output ./src/typegen/src/interfaces --strict",
+    "lint": "eslint . --ext .ts",
+    "fix": "eslint . --ext .ts --fix",
+    "compile": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@polkadot/typegen": "^2.10.1",
+    "@polkadot/dev": "^0.60.13",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.4",
+    "@typescript-eslint/eslint-plugin": "^4.9.1",
+    "@typescript-eslint/parser": "^4.9.1",
     "chai": "^4.2.0",
+    "eslint": "^7.15.0",
+    "husky": "^4.3.5",
     "mocha": "^8.2.1",
     "should": "^13.2.3",
     "ts-mocha": "^8.0.0",
@@ -30,5 +37,10 @@
     "@polkadot/types": "^2.10.1",
     "aws-sdk": "^2.799.0",
     "dotenv": "^8.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn lint"
+    }
   }
 }

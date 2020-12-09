@@ -1,7 +1,10 @@
-require('dotenv').config()
-import setup from './utils/setup'
-import {Job, JobReads} from './job'
+/* eslint-disable */
+require("dotenv").config();
 
-export { setup, Job, JobReads }
-export * from './interfaces'
-export * from './types'
+import setup from "./utils/setup";
+import { Job, JobReads } from "./job";
+
+
+export { setup, Job, JobReads };
+export * from "./interfaces";
+export * from "./types";

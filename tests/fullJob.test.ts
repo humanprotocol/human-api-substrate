@@ -2,11 +2,13 @@ import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
 import { hash, getDecimals, formatDecimals } from "../src/utils/substrate";
+import { ApiPromise } from "@polkadot/api";
+import should from "should";
 
 const { assert } = require("chai");
 
 describe("job", async () => {
-  let api: any;
+  let api: ApiPromise;
   let keyring: any;
   let alice: any;
   let bob: any;
@@ -31,7 +33,7 @@ describe("job", async () => {
   };
 
   before(async function () {
-    let obj = await setup();
+    const obj = await setup();
     api = obj.api;
     keyring = obj.keyring;
     alice = keyring.addFromUri("//Alice");
@@ -58,7 +60,7 @@ describe("job", async () => {
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
-    assert.deepEqual(escrow, mockData, "escrow should match mock data");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
   });
 
   it("launches a job", async () => {
@@ -66,7 +68,7 @@ describe("job", async () => {
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
-    assert.deepEqual(escrow, mockData, "escrow should match mock data");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
     const escrowBalance = await job.balance();
     assert(escrowBalance.toString() !== "0", "escrow should have been hydrated");
   });
@@ -97,12 +99,16 @@ describe("job", async () => {
       manifest.recording_oracle_addr,
       new BN("5")
     );
-    const amountToSend = await formatDecimals(api, 10);
+    const amountToSend = formatDecimals(api, 10);
     const escrowBefore = await job.escrow();
     await job.fundEscrow(escrowBefore.account, amountToSend);
     await job.abort();
-    const escrow = await job.escrow();
-    assert.equal(escrow, null, "escrow should be deleted");
+    try {
+      await job.escrow();
+      should.fail("expected to not get an escrow", null);
+    } catch (error) {
+      assert.equal(error.message, "Option: unwrapping a None value")
+    }
   });
   it("cancel escrow", async () => {
     const job = await Job.createEscrow(
@@ -121,7 +127,7 @@ describe("job", async () => {
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
     mockData.status = "Cancelled";
-    assert.deepEqual(escrow, mockData, "escrow should be cancelled");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should be cancelled");
   });
   it("stores intermediate results then fetches them", async () => {
     const job = await Job.createEscrow(
@@ -180,12 +186,12 @@ describe("job", async () => {
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
     mockData.status = "Paid";
-    assert.deepEqual(escrow, mockData, "escrow should be paid");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should be paid");
 
     await job.complete();
     const completedEscrow = await job.escrow();
     mockData.status = "Complete";
-    assert.deepEqual(completedEscrow, mockData, "escrow should be paid");
+    assert.deepEqual(completedEscrow.toJSON(), mockData, "escrow should be paid");
   });
   it("does a bulk payout with results not full payout", async () => {
     const job = await Job.createEscrow(
@@ -229,7 +235,7 @@ describe("job", async () => {
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
     mockData.status = "Partial";
-    assert.deepEqual(escrow, mockData, "escrow should be partial");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should be partial");
 
     const finalResultReturn = await job.finalResults();
     assert.deepEqual(

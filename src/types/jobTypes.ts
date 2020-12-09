@@ -1,16 +1,16 @@
 import BN from 'bn.js';
 
-export type Status = String;
+export type Status = string;
 
-export type Url = String;
+export type Url = string;
 
-export type Hash = String;
+export type Hash = string;
 
 export type PrivateKey = Uint8Array;
 
-export type PublicKey = String;
+export type PublicKey = string;
 
-export type Address = String;
+export type Address = string;
 
 export type EscrowManifest = any;
 
@@ -24,6 +24,6 @@ export type Results = any;
 
 export type Manifest = any;
 
-export type EndTime = Number;
+export type EndTime = number;
 
 export type Stake = BN;

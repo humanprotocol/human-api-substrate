@@ -1,16 +1,16 @@
-import {PrivateKey, Address, Amount, Hash, Url, Status, EndTime} from '../types'
+import { Address, Amount, EndTime, Hash, PrivateKey, Status, Url } from '../types';
 
 export interface Credentials {
-	gasPayer: Address
-	gasPayerPriv: PrivateKey
+  gasPayer: Address;
+  gasPayerPriv: PrivateKey;
 }
 
 export interface StorageInfo {
-	hash: Hash, 
-	url: Url
+  hash: Hash;
+  url: Url;
 }
 
 export interface Payouts {
-	addresses: Array<Address>
-	amounts: Array<Amount>
+  addresses: Array<Address>;
+  amounts: Array<Amount>;
 }
