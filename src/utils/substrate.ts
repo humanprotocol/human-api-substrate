@@ -33,7 +33,7 @@ export const getDecimals = (api: ApiPromise): number => {
 
 export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
 	return new BN(amount * (10 ** getDecimals(api)))
-} 
+}
 
 /**
  * Signs and sends the given `call` from `sender` and waits for an event that fits `filter`.
@@ -51,7 +51,7 @@ export function sendAndWaitFor(api: ApiPromise, call: SubmittableExtrinsic<'prom
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
+
 					console.error(`${section}.${name}: ${documentation.join(' ')}`);
 				} else {
 					// Other, CannotLookup, BadOrigin, no extra info
@@ -86,7 +86,7 @@ export function sendAndWait(api: ApiPromise, call: SubmittableExtrinsic<'promise
 					// for module errors, we have the section indexed, lookup
 					const decoded = api.registry.findMetaError(dispatchError.asModule);
 					const { documentation, name, section } = decoded;
-			
+
 					console.error(`${section}.${name}: ${documentation.join(' ')}`);
 				} else {
 					// Other, CannotLookup, BadOrigin, no extra info

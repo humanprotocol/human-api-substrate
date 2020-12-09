@@ -5,24 +5,29 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -t 30000 -r ts-node/register 'tests/**/*.ts'",
-    "compile": "tsc"
+    "compile": "tsc",
+    "generate": "yarn generate:defs && yarn generate:meta",
+    "generate:defs": "ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package '.' --input ./src/typegen/src/interfaces",
+    "generate:meta": "ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --package '.' --endpoint ./src/typegen/hmt-metadata.json --output ./src/typegen/src/interfaces --strict"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@polkadot/typegen": "^2.10.1",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.4",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
     "should": "^13.2.3",
     "ts-mocha": "^8.0.0",
+    "ts-node": "^8.6.2",
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "@polkadot/api": "^2.8.1",
+    "@polkadot/api": "^2.10.1",
     "@polkadot/keyring": "^4.2.1",
-    "@polkadot/types": "^2.8.1",
+    "@polkadot/types": "^2.10.1",
     "aws-sdk": "^2.799.0",
     "dotenv": "^8.2.0"
   }

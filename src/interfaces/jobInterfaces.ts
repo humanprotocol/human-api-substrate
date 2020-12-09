@@ -14,16 +14,3 @@ export interface Payouts {
 	addresses: Array<Address>
 	amounts: Array<Amount>
 }
-
-export interface EscrowInfo {
-	status: Status,
-	end_time: EndTime,
-  	manifest_url: Url,
-	manifest_hash: Hash,
-	reputation_oracle: Address,
-	recording_oracle: Address,
-	reputation_oracle_stake: Number,
-	recording_oracle_stake: Number,
-	canceller: Address,
-	account: Address
-	}

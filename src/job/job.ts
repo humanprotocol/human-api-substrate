@@ -3,10 +3,12 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { KeyringPair } from "@polkadot/keyring/types";
 import BN from "bn.js";
 import { Payouts } from "../interfaces";
-import { EscrowId, Address, PublicKey, Results, Url, Manifest, Stake, Amount } from "../types";
+import { Address, PublicKey, Results, Url, Manifest, Stake, Amount } from "../types";
 import { sendAndWaitFor, formatDecimals, sendAndWait } from "../utils/substrate";
 import { upload } from "../storage";
 import JobReads from "./jobReads";
+import { EscrowId } from "../typegen/src/interfaces";
+import { AccountId, Balance } from "@polkadot/types/interfaces";
 
 export default class Job extends JobReads {
   sender: KeyringPair;
@@ -69,7 +71,7 @@ export default class Job extends JobReads {
       .then((record) => {
         // The first element in the `Pending` event is the escrow id.
         // Note: This is note type safe in any way. Todo: Find more principled way.
-        const id: EscrowId = new BN(record.event.data[0].toString());
+        const id: EscrowId = api.createType("EscrowId", record.event.data[0]);
         return id;
       })
       .then((id: EscrowId) => {
@@ -77,12 +79,12 @@ export default class Job extends JobReads {
       });
   }
 
-  async fundEscrow(escrowAddress: Address, amount: Amount) {
-    const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
+  async fundEscrow(escrowAddress: AccountId, amount: Balance | BN | number) {
+    const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(escrowAddress, amount);
     await sendAndWaitFor(this.api, call, this.sender, { section: "balances", name: "Transfer" });
   }
 
-  async addTrustedHandlers(handlers: Array<Address>) {
+  async addTrustedHandlers(handlers: Array<AccountId>) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
     await sendAndWait(this.api, call, this.sender);
   }

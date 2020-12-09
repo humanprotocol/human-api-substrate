@@ -1,7 +1,5 @@
 import BN from 'bn.js';
 
-export type EscrowId = BN;
-
 export type Status = String;
 
 export type Url = String;
