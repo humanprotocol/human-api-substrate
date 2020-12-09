@@ -20,6 +20,7 @@
     "@typescript-eslint/parser": "^4.9.1",
     "chai": "^4.2.0",
     "eslint": "^7.15.0",
+    "husky": "^4.3.5",
     "mocha": "^8.2.1",
     "should": "^13.2.3",
     "ts-mocha": "^8.0.0",
@@ -31,5 +32,10 @@
     "@polkadot/types": "^2.8.1",
     "aws-sdk": "^2.799.0",
     "dotenv": "^8.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
   }
 }
