@@ -1,2 +1,2 @@
 export * from './jobInterfaces';
-export * from './substrateInterfaces'
+export * from './substrateInterfaces';

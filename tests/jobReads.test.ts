@@ -13,7 +13,7 @@ describe("Job reads", async () => {
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
 
   before(async function () {
-    let obj = await setup();
+    const obj = await setup();
     api = obj.api;
     keyring = obj.keyring;
 
