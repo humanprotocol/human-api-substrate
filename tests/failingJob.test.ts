@@ -1,7 +1,7 @@
 import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
-import { hash, getDecimals, formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
+import { formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
 
 import should from "should";
 const { assert } = require("chai");
