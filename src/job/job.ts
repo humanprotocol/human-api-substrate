@@ -3,14 +3,14 @@ import BN from 'bn.js';
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { AccountId, Balance } from '@polkadot/types/interfaces';
 
 import { Payouts } from '../interfaces';
 import { upload } from '../storage';
-import { Manifest, PublicKey, Results, Stake } from '../types';
 import { EscrowId } from "../typegen/src/interfaces";
+import { Manifest, PublicKey, Results, Stake } from '../types';
 import { formatDecimals, sendAndWait, sendAndWaitFor } from '../utils/substrate';
 import JobReads from './jobReads';
-import { AccountId, Balance } from '@polkadot/types/interfaces';
 
 export default class Job extends JobReads {
   sender: KeyringPair;

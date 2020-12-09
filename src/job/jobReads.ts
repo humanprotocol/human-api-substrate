@@ -1,5 +1,3 @@
-import BN from 'bn.js';
-
 import { ApiPromise } from '@polkadot/api';
 import { AccountId, Balance } from "@polkadot/types/interfaces";
 
@@ -18,8 +16,9 @@ export default class JobReads {
     this.storedIntermediateResults = [];
   }
 
-  async escrow(): Promise<EscrowInfo> {
+  async escrow (): Promise<EscrowInfo> {
     const escrow = await this.api.query.escrow.escrows(this.escrowId);
+
     return escrow.unwrap();
   }
 
@@ -39,7 +38,7 @@ export default class JobReads {
   /**
    * @return balance of escrow instance
    */
-  async balance(): Promise<Balance> {
+  async balance (): Promise<Balance> {
     const escrow = await this.escrow();
     const balance = await this.api.query.system.account(escrow.account);
 
@@ -61,7 +60,7 @@ export default class JobReads {
    * @param index index of intermediate result to get
    * @returns The manifest or error if can't decrypt
    */
-  public async intermediateResults(index: any, privKey?: PrivateKey): Promise<any> {
+  public async intermediateResults (index: any, privKey?: PrivateKey): Promise<any> {
     if (!this.storedIntermediateResults[index]) {
       throw new Error('Intermediate Results out of bounds');
     }
@@ -79,6 +78,7 @@ export default class JobReads {
     // TODO get proper type from polkadot js
     const finalResultsOption: any = await this.api.query.escrow.finalResults(this.escrowId);
     const finalResults = finalResultsOption.unwrap();
+
     return download(finalResults.results_url.toHuman(), privKey);
   }
 }
