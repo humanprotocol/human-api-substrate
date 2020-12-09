@@ -2,12 +2,13 @@ import { Job, setup, JobReads } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
 import should from "should";
+import { ApiPromise } from "@polkadot/api";
 const assert = require("assert");
 
 describe("Job reads", async () => {
-  let api: any;
+  let api: ApiPromise;
   let keyring: any;
-  let jobRead: any;
+  let jobRead: JobReads;
   let alice: any;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
@@ -33,7 +34,7 @@ describe("Job reads", async () => {
     const escrow = await jobRead.escrow();
     const mockData = {
       status: "Pending",
-      end_time: escrow.end_time,
+      end_time: escrow.toJSON().end_time,
       manifest_url: "0x736f6d652e75726c",
       manifest_hash: "0x3078646576",
       reputation_oracle: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
@@ -41,10 +42,10 @@ describe("Job reads", async () => {
       reputation_oracle_stake: 10,
       recording_oracle_stake: 10,
       canceller: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-      account: escrow.account,
+      account: escrow.account.toString(),
     };
 
-    assert.deepEqual(escrow, mockData, "escrow should match mock data");
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
   });
 
   it(`queries balance`, async () => {

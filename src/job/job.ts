@@ -3,10 +3,12 @@ import BN from 'bn.js';
 import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { AccountId, Balance } from '@polkadot/types/interfaces';
 
 import { Payouts } from '../interfaces';
 import { upload } from '../storage';
-import { Address, Amount, EscrowId, Manifest, PublicKey, Results, Stake } from '../types';
+import { EscrowId } from "../typegen/src/interfaces";
+import { Manifest, PublicKey, Results, Stake } from '../types';
 import { formatDecimals, sendAndWait, sendAndWaitFor } from '../utils/substrate';
 import JobReads from './jobReads';
 
@@ -58,8 +60,8 @@ export default class Job extends JobReads {
     sender: KeyringPair,
     manifestUrl: string,
     manifestHash: string,
-    reputationOracle: Address,
-    recordingOracle: Address,
+    reputationOracle: AccountId | string,
+    recordingOracle: AccountId | string,
     oracleStake: Stake
   ): Promise<Job> {
     const call: SubmittableExtrinsic<'promise'> = api.tx.escrow.create(
@@ -73,18 +75,18 @@ export default class Job extends JobReads {
     const record = await sendAndWaitFor(api, call, sender, { section: 'escrow', name: 'Pending' }).catch((e) => {
       throw new Error(e.message);
     });
-    const id: EscrowId = new BN(record.event.data[0].toString());
+    const id: EscrowId = api.createType("EscrowId", record.event.data[0]);
 
     return new Job(api, sender, id);
   }
 
-  async fundEscrow (escrowAddress: Address, amount: Amount) {
-    const call: SubmittableExtrinsic<'promise'> = this.api.tx.balances.transfer(escrowAddress.toString(), amount);
+  async fundEscrow (escrowAddress: AccountId, amount: Balance | BN | number) {
+    const call: SubmittableExtrinsic<'promise'> = this.api.tx.balances.transfer(escrowAddress, amount);
 
     await sendAndWaitFor(this.api, call, this.sender, { section: 'balances', name: 'Transfer' });
   }
 
-  async addTrustedHandlers (handlers: Array<Address>) {
+  async addTrustedHandlers (handlers: Array<AccountId>) {
     const call: SubmittableExtrinsic<'promise'> = this.api.tx.escrow.addTrustedHandlers(this.escrowId, handlers);
 
     await sendAndWait(this.api, call, this.sender).catch((e) => {

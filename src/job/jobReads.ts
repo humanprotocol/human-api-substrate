@@ -1,9 +1,9 @@
-import BN from 'bn.js';
-
 import { ApiPromise } from '@polkadot/api';
+import { AccountId, Balance } from "@polkadot/types/interfaces";
 
 import { download } from '../storage';
-import { Address, EscrowId, Manifest, PrivateKey, Url } from '../types';
+import { EscrowId, EscrowInfo } from "../typegen/src/interfaces";
+import { Manifest, PrivateKey, Url } from '../types';
 
 export default class JobReads {
   api: ApiPromise;
@@ -16,10 +16,10 @@ export default class JobReads {
     this.storedIntermediateResults = [];
   }
 
-  async escrow (): Promise<any> {
+  async escrow (): Promise<EscrowInfo> {
     const escrow = await this.api.query.escrow.escrows(this.escrowId);
 
-    return escrow.toJSON();
+    return escrow.unwrap();
   }
 
   /**
@@ -28,8 +28,8 @@ export default class JobReads {
    * @return Boolean
    * @dev Retrieves if the address is a trusted handler from the escrow instance
    */
-  async isTrustedHandler (address: Address): Promise<boolean> {
-    const isTrustedHander = await this.api.query.escrow.trustedHandlers(this.escrowId, address.toString());
+  async isTrustedHandler (address: AccountId): Promise<boolean> {
+    const isTrustedHander = await this.api.query.escrow.trustedHandlers(this.escrowId, address);
     const trusted = this.api.createType('bool', isTrustedHander);
 
     return trusted.valueOf();
@@ -38,7 +38,7 @@ export default class JobReads {
   /**
    * @return balance of escrow instance
    */
-  async balance (): Promise<BN> {
+  async balance (): Promise<Balance> {
     const escrow = await this.escrow();
     const balance = await this.api.query.system.account(escrow.account);
 
@@ -60,13 +60,13 @@ export default class JobReads {
    * @param index index of intermediate result to get
    * @returns The manifest or error if can't decrypt
    */
-  public async intermediateResults (index: any, privKey?: PrivateKey): Promise<Manifest> {
+  public async intermediateResults (index: any, privKey?: PrivateKey): Promise<any> {
     if (!this.storedIntermediateResults[index]) {
       throw new Error('Intermediate Results out of bounds');
     }
 
     // TODO test this when able to (writes complete)
-    return this.manifest(this.storedIntermediateResults[index].url, privKey);
+    return download(this.storedIntermediateResults[index].url, privKey);
   }
 
   /**
@@ -79,6 +79,6 @@ export default class JobReads {
     const finalResultsOption: any = await this.api.query.escrow.finalResults(this.escrowId);
     const finalResults = finalResultsOption.unwrap();
 
-    return this.manifest(finalResults.results_url.toHuman(), privKey);
+    return download(finalResults.results_url.toHuman(), privKey);
   }
 }
