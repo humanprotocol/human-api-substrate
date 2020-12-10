@@ -23,7 +23,15 @@ describe("Job reads", async () => {
     const charlie = keyring.addFromUri("//Charlie");
     const manifestUrl = "some.url";
     const manifestHash = "0xdev";
-    const job = await Job.createEscrow(api, alice, manifestUrl, manifestHash, bob.address, charlie.address, new BN(10));
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      bob.address,
+      charlie.address,
+      new BN(10)
+    );
     jobRead = new JobReads(api, job.escrowId);
   });
   after(function () {
@@ -45,7 +53,11 @@ describe("Job reads", async () => {
       account: escrow.account.toString(),
     };
 
-    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
+    assert.deepEqual(
+      escrow.toJSON(),
+      mockData,
+      "escrow should match mock data"
+    );
   });
 
   it(`queries balance`, async () => {

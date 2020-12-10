@@ -17,7 +17,8 @@ describe("failing job", async () => {
   let amountToSend: any;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
-  const manifestHash = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
+  const manifestHash =
+    "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
 
   before(async function () {
     const obj = await setup();
@@ -47,11 +48,14 @@ describe("failing job", async () => {
         manifest.recording_oracle_addr,
         new BN("5")
       );
-      console.log("after create")
+      console.log("after create");
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
-      console.debug(e)
-      assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
+      console.debug(e);
+      assert.equal(
+        e.message,
+        "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
+      );
     }
   });
 
@@ -73,14 +77,20 @@ describe("failing job", async () => {
       await Job.launch(api, eve, manifest);
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
-      assert.equal(e.message, "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low");
+      assert.equal(
+        e.message,
+        "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
+      );
     }
   });
 
   it("fails launch on funding escrow", async () => {
     manifest.task_bid_price = "10";
     const call = api.tx.balances.transfer(dave.address, "100000000000000");
-    await sendAndWaitFor(api, call, alice, { section: "balances", name: "Transfer" }).catch((e) => {
+    await sendAndWaitFor(api, call, alice, {
+      section: "balances",
+      name: "Transfer",
+    }).catch((e) => {
       throw new Error(e.message);
     });
     const currentEscrow = await api.query.escrow.counter();
@@ -135,7 +145,10 @@ describe("failing job", async () => {
       await eveJob.addTrustedHandlers(handlers);
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
-      assert.equal(e.message, `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`);
+      assert.equal(
+        e.message,
+        `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`
+      );
     }
   });
   it("fails to bulk payout", async () => {

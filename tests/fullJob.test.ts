@@ -17,13 +17,15 @@ describe("job", async () => {
   let amountToSend: any;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
-  const manifestHash = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
+  const manifestHash =
+    "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
   const mockData = {
     status: "Pending",
     end_time: 0,
     manifest_url:
       "0x68747470733a2f2f68756d616e2d7061726974792d69732d7468652d626573742e73332e616d617a6f6e6177732e636f6d2f7333307832353130313561313235663764333466393234616335616338343866313230623635396630393836336534653335353634313432306635363432353833336235",
-    manifest_hash: "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5",
+    manifest_hash:
+      "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5",
     reputation_oracle: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
     recording_oracle: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
     reputation_oracle_stake: 5,
@@ -60,7 +62,11 @@ describe("job", async () => {
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
-    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
+    assert.deepEqual(
+      escrow.toJSON(),
+      mockData,
+      "escrow should match mock data"
+    );
   });
 
   it("launches a job", async () => {
@@ -68,9 +74,16 @@ describe("job", async () => {
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
-    assert.deepEqual(escrow.toJSON(), mockData, "escrow should match mock data");
+    assert.deepEqual(
+      escrow.toJSON(),
+      mockData,
+      "escrow should match mock data"
+    );
     const escrowBalance = await job.balance();
-    assert(escrowBalance.toString() !== "0", "escrow should have been hydrated");
+    assert(
+      escrowBalance.toString() !== "0",
+      "escrow should have been hydrated"
+    );
   });
 
   it("funds and escrow", async () => {
@@ -87,7 +100,11 @@ describe("job", async () => {
     const escrow = await job.escrow();
     await job.fundEscrow(escrow.account, amountToSend);
     const escrowBalance = await job.balance();
-    assert.equal(escrowBalance.toString(), amountToSend.toString(), "escrow should have funds");
+    assert.equal(
+      escrowBalance.toString(),
+      amountToSend.toString(),
+      "escrow should have funds"
+    );
   });
   it("aborts escrow", async () => {
     const job = await Job.createEscrow(
@@ -107,7 +124,7 @@ describe("job", async () => {
       await job.escrow();
       should.fail("expected to not get an escrow", null);
     } catch (error) {
-      assert.equal(error.message, "Option: unwrapping a None value")
+      assert.equal(error.message, "Option: unwrapping a None value");
     }
   });
   it("cancel escrow", async () => {
@@ -160,7 +177,9 @@ describe("job", async () => {
     );
 
     const escrowBefore = await job.escrow();
-    const balanceOfCharlieBefore = await api.query.system.account(charlie.address);
+    const balanceOfCharlieBefore = await api.query.system.account(
+      charlie.address
+    );
     const balanceOfDaveBefore = await api.query.system.account(dave.address);
 
     await job.fundEscrow(escrowBefore.account, amountToSend);
@@ -171,7 +190,9 @@ describe("job", async () => {
     await job.bulkPayout(payout);
 
     const escrow = await job.escrow();
-    const balanceOfCharlieAfter = await api.query.system.account(charlie.address);
+    const balanceOfCharlieAfter = await api.query.system.account(
+      charlie.address
+    );
     const balanceOfDaveAfter = await api.query.system.account(dave.address);
     const balanceOfPalletAfter = await job.balance();
 
@@ -180,7 +201,11 @@ describe("job", async () => {
       Number(balanceOfCharlieBefore.data.free),
       "charlie should "
     );
-    assert.isAbove(Number(balanceOfDaveAfter.data.free), Number(balanceOfDaveBefore.data.free), "charlie should ");
+    assert.isAbove(
+      Number(balanceOfDaveAfter.data.free),
+      Number(balanceOfDaveBefore.data.free),
+      "charlie should "
+    );
     assert(balanceOfPalletAfter.isZero());
 
     mockData.end_time = Number(escrow.end_time);
@@ -191,7 +216,11 @@ describe("job", async () => {
     await job.complete();
     const completedEscrow = await job.escrow();
     mockData.status = "Complete";
-    assert.deepEqual(completedEscrow.toJSON(), mockData, "escrow should be paid");
+    assert.deepEqual(
+      completedEscrow.toJSON(),
+      mockData,
+      "escrow should be paid"
+    );
   });
   it("does a bulk payout with results not full payout", async () => {
     const job = await Job.createEscrow(
@@ -205,7 +234,9 @@ describe("job", async () => {
     );
 
     const escrowBefore = await job.escrow();
-    const balanceOfCharlieBefore = await api.query.system.account(charlie.address);
+    const balanceOfCharlieBefore = await api.query.system.account(
+      charlie.address
+    );
     const balanceOfDaveBefore = await api.query.system.account(dave.address);
     const balanceOfJobBefore = await job.balance();
 
@@ -220,7 +251,9 @@ describe("job", async () => {
     await job.storeFinalResults(finalResults);
     await job.bulkPayout(payout);
     const escrow = await job.escrow();
-    const balanceOfCharlieAfter = await api.query.system.account(charlie.address);
+    const balanceOfCharlieAfter = await api.query.system.account(
+      charlie.address
+    );
     const balanceOfDaveAfter = await api.query.system.account(dave.address);
     const balanceOfJobAfter = await job.balance();
 
@@ -229,8 +262,16 @@ describe("job", async () => {
       Number(balanceOfCharlieBefore.data.free),
       "charlie should "
     );
-    assert.isAbove(Number(balanceOfDaveAfter.data.free), Number(balanceOfDaveBefore.data.free), "charlie should ");
-    assert.isBelow(Number(balanceOfJobBefore), Number(balanceOfJobAfter), "job should have less funds");
+    assert.isAbove(
+      Number(balanceOfDaveAfter.data.free),
+      Number(balanceOfDaveBefore.data.free),
+      "charlie should "
+    );
+    assert.isBelow(
+      Number(balanceOfJobBefore),
+      Number(balanceOfJobAfter),
+      "job should have less funds"
+    );
 
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();

@@ -9,8 +9,10 @@
     "generate:defs": "ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package '.' --input ./src/typegen/src/interfaces",
     "generate:meta": "ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --package '.' --endpoint ./src/typegen/hmt-metadata.json --output ./src/typegen/src/interfaces --strict",
     "lint": "eslint . --ext .ts",
-    "fix": "eslint . --ext .ts --fix",
-    "compile": "tsc"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "compile": "tsc",
+    "prettier:fix": "prettier --write .",
+    "prettier": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -26,6 +28,7 @@
     "eslint": "^7.15.0",
     "husky": "^4.3.5",
     "mocha": "^8.2.1",
+    "prettier": "2.2.1",
     "should": "^13.2.3",
     "ts-mocha": "^8.0.0",
     "ts-node": "^8.6.2",
@@ -40,7 +43,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "yarn lint"
+      "pre-push": "yarn lint && yarn prettier"
     }
   }
 }
