@@ -9,9 +9,14 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.aws_secret_access_key,
 });
 
-const bucketName: string = process.env.bucket_name ? process.env.bucket_name : " ";
+const bucketName: string = process.env.bucket_name
+  ? process.env.bucket_name
+  : " ";
 
-export const upload = async (data: Manifest, pubKey?: string): Promise<StorageInfo> => {
+export const upload = async (
+  data: Manifest,
+  pubKey?: string
+): Promise<StorageInfo> => {
   // TODO handle encryption if pubkey
   const computedHash = hash(JSON.stringify(data));
   const Key = `s3${computedHash}`;
@@ -38,7 +43,10 @@ export const upload = async (data: Manifest, pubKey?: string): Promise<StorageIn
   };
 };
 
-export const download = async (url: Url, privKey?: PrivateKey): Promise<string> => {
+export const download = async (
+  url: Url,
+  privKey?: PrivateKey
+): Promise<string> => {
   // TODO handle decryption if privKey (throw error if no key)
   const s3UrlConstant = "s3.amazonaws.com/";
   const sliceAmount = url.indexOf(s3UrlConstant) + s3UrlConstant.length;

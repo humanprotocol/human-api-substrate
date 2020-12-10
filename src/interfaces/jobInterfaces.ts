@@ -1,4 +1,4 @@
-import { Address, Amount, Hash, PrivateKey, Url } from '../types';
+import { Address, Amount, Hash, PrivateKey, Url } from "../types";
 
 export interface Credentials {
   gasPayer: Address;

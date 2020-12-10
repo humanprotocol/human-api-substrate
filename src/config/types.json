@@ -2,13 +2,7 @@
   "EscrowId": "u128",
   "Moment": "u64",
   "EscrowStatus": {
-    "_enum": [
-      "Pending",
-      "Partial",
-      "Paid",
-      "Complete",
-      "Cancelled"
-    ]
+    "_enum": ["Pending", "Partial", "Paid", "Complete", "Cancelled"]
   },
   "EscrowInfo": {
     "status": "EscrowStatus",

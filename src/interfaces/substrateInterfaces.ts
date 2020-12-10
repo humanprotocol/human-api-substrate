@@ -1,4 +1,4 @@
-import { ApiPromise, Keyring } from '@polkadot/api';
+import { ApiPromise, Keyring } from "@polkadot/api";
 
 export interface Setup {
   api: ApiPromise;

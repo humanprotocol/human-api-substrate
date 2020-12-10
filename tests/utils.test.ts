@@ -16,13 +16,22 @@ describe("utils", async () => {
   });
   it("should hash a manifest", async function () {
     const hashed = await hash(JSON.stringify(manifest));
-    const result = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
+    const result =
+      "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
     assert.equal(hashed, result, "hashing should be correct");
   });
   it("should convert a number to proper decimals", async function () {
     const decimals = await getDecimals(api);
-    assert.equal(decimals.toString(), "12", "there should be 12 decimals by default");
+    assert.equal(
+      decimals.toString(),
+      "12",
+      "there should be 12 decimals by default"
+    );
     const formatted = await formatDecimals(api, 10);
-    assert.equal(formatted.toString(), "10000000000000", "balance should be converted properly");
+    assert.equal(
+      formatted.toString(),
+      "10000000000000",
+      "balance should be converted properly"
+    );
   });
 });
