@@ -7,8 +7,7 @@ import { AccountId, Balance } from "@polkadot/types/interfaces";
 
 import { Manifest, Payouts } from "../interfaces";
 import { upload } from "../storage";
-import { EscrowId } from "../typegen/src/interfaces";
-import { PublicKey } from "../types";
+import { EscrowId, PublicKey } from "../types";
 import {
   formatDecimals,
   sendAndWait,

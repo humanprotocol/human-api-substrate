@@ -4,8 +4,7 @@ import { ApiPromise } from "@polkadot/api";
 import { AccountId, Balance } from "@polkadot/types/interfaces";
 
 import { download } from "../storage";
-import { EscrowId, EscrowInfo, ResultInfo } from "../typegen/src/interfaces";
-import { PrivateKey } from "../types";
+import { EscrowId, EscrowInfo, PrivateKey } from "../types";
 
 export default class JobReads {
   api: ApiPromise;
