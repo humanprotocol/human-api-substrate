@@ -1,6 +1,7 @@
+import { Manifest } from "src/interfaces";
+
 import { ApiPromise } from "@polkadot/api";
 import { AccountId, Balance } from "@polkadot/types/interfaces";
-import { Manifest } from "src/interfaces";
 
 import { download } from "../storage";
 import { EscrowId, EscrowInfo, ResultInfo } from "../typegen/src/interfaces";

@@ -1,4 +1,5 @@
 import BN from "bn.js";
+
 import { AccountId } from "@polkadot/types/interfaces";
 
 export interface Manifest {
