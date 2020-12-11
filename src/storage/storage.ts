@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 
 import { StorageInfo } from "../interfaces";
-import { Manifest, PrivateKey, Url } from "../types";
+import { PrivateKey } from "../types";
 import { hash } from "../utils/substrate";
 
 const s3 = new AWS.S3({
@@ -14,7 +14,7 @@ const bucketName: string = process.env.bucket_name
   : " ";
 
 export const upload = async (
-  data: Manifest,
+  data: any,
   pubKey?: string
 ): Promise<StorageInfo> => {
   // TODO handle encryption if pubkey
@@ -44,7 +44,7 @@ export const upload = async (
 };
 
 export const download = async (
-  url: Url,
+  url: string,
   privKey?: PrivateKey
 ): Promise<string> => {
   // TODO handle decryption if privKey (throw error if no key)
