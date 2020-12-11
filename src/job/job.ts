@@ -94,7 +94,10 @@ export default class Job extends JobReads {
     return new Job(api, sender, id);
   }
 
-  async fundEscrow(escrowAddress: AccountId | string, amount: Balance | BN | number) {
+  async fundEscrow(
+    escrowAddress: AccountId | string,
+    amount: Balance | BN | number
+  ) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(
       escrowAddress,
       amount
