@@ -1,1 +1,3 @@
-export * from "./jobTypes";
+export type PrivateKey = Uint8Array;
+
+export type PublicKey = string;

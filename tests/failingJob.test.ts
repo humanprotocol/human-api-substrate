@@ -4,17 +4,19 @@ import manifest from "../example-manifest.json";
 import { formatDecimals, sendAndWaitFor } from "../src/utils/substrate";
 
 import should from "should";
+import { ApiPromise, Keyring } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
 const { assert } = require("chai");
 
 describe("failing job", async () => {
-  let api: any;
-  let keyring: any;
-  let alice: any;
-  let bob: any;
-  let charlie: any;
-  let dave: any;
-  let eve: any;
-  let amountToSend: any;
+  let api: ApiPromise;
+  let keyring: Keyring;
+  let alice: KeyringPair;
+  let bob: KeyringPair;
+  let charlie: KeyringPair;
+  let dave: KeyringPair;
+  let eve: KeyringPair;
+  let amountToSend: BN;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
   const manifestHash =
@@ -29,7 +31,6 @@ describe("failing job", async () => {
     charlie = keyring.addFromUri("//Charlie");
     dave = keyring.addFromUri("//Dave");
     eve = keyring.addFromUri("//Eve");
-
     amountToSend = formatDecimals(api, 10);
   });
 
@@ -48,10 +49,8 @@ describe("failing job", async () => {
         manifest.recording_oracle_addr,
         new BN("5")
       );
-      console.log("after create");
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
-      console.debug(e);
       assert.equal(
         e.message,
         "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"

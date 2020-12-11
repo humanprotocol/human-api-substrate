@@ -1,16 +1,19 @@
-import { Address, Amount, Hash, PrivateKey, Url } from "../types";
+import BN from "bn.js";
+import { AccountId } from "@polkadot/types/interfaces";
 
-export interface Credentials {
-  gasPayer: Address;
-  gasPayerPriv: PrivateKey;
-}
-
-export interface StorageInfo {
-  hash: Hash;
-  url: Url;
+export interface Manifest {
+  recording_oracle_addr: string;
+  reputation_oracle_addr: string;
+  oracle_stake: number;
+  [propName: string]: any;
 }
 
 export interface Payouts {
-  addresses: Array<Address>;
-  amounts: Array<Amount>;
+  addresses: Array<AccountId | string>;
+  amounts: Array<BN | number>;
+}
+
+export interface StorageInfo {
+  hash: string;
+  url: string;
 }

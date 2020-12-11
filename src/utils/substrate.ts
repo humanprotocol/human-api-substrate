@@ -1,41 +1,23 @@
 import BN from "bn.js";
 
 import { ApiPromise, SubmittableResult } from "@polkadot/api";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { Keyring } from "@polkadot/keyring";
+import { AddressOrPair, SubmittableExtrinsic } from "@polkadot/api/types";
 import { EventRecord } from "@polkadot/types/interfaces/types";
 import { blake2AsHex } from "@polkadot/util-crypto";
 
 import { EventFilter } from "../interfaces";
-import { Account, Address, Amount, PrivateKey } from "../types";
 
 /**
- * @param privateKey Private key of contract launcher
- * @return address of Private Key
- * @dev Retrieves the address of the private key
+ * Get the decimals of the main currency on chain
  */
-export const privateKeyToAddress = (privateKey: PrivateKey): Address => {
-  const keyring = new Keyring({ type: "sr25519", ss58Format: 2 });
-
-  return keyring.addFromSeed(privateKey).address;
-};
-
-/**
- * @param privateKey Private key of contract launcher
- * @return address of Private Key
- * @dev Retrieves the account of the private key
- */
-export const privateKeyToAccount = (privateKey: PrivateKey): Account => {
-  const keyring = new Keyring({ type: "sr25519", ss58Format: 2 });
-
-  return keyring.addFromSeed(privateKey);
-};
-
 export const getDecimals = (api: ApiPromise): number => {
   return api.registry.chainDecimals;
 };
 
-export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
+/**
+ * Format `amount` according to/multiply by the decimals of the main currency on chain.
+ */
+export const formatDecimals = (api: ApiPromise, amount: number): BN => {
   return new BN(amount * 10 ** getDecimals(api));
 };
 
@@ -49,7 +31,7 @@ export const formatDecimals = (api: ApiPromise, amount: number): Amount => {
 export function sendAndWaitFor(
   api: ApiPromise,
   call: SubmittableExtrinsic<"promise">,
-  sender: Account,
+  sender: AddressOrPair,
   filter: EventFilter
 ): Promise<EventRecord> {
   return new Promise<EventRecord>((resolve, reject) => {
@@ -94,7 +76,7 @@ export function sendAndWaitFor(
 export function sendAndWait(
   api: ApiPromise,
   call: SubmittableExtrinsic<"promise">,
-  sender: Account
+  sender: AddressOrPair
 ): Promise<undefined> {
   return new Promise<undefined>((resolve, reject) => {
     call

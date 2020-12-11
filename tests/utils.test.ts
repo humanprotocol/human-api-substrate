@@ -1,7 +1,6 @@
 import { setup } from "../src/index";
 import { hash, getDecimals, formatDecimals } from "../src/utils/substrate";
 import manifest from "../example-manifest.json";
-import BN from "bn.js";
 const assert = require("assert");
 
 describe("utils", async () => {

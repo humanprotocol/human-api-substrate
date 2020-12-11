@@ -1,20 +1,21 @@
 import { Job, setup, Payouts } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
-import { hash, getDecimals, formatDecimals } from "../src/utils/substrate";
-import { ApiPromise } from "@polkadot/api";
+import { formatDecimals } from "../src/utils/substrate";
+import { ApiPromise, Keyring } from "@polkadot/api";
 import should from "should";
+import { KeyringPair } from "@polkadot/keyring/types";
 
 const { assert } = require("chai");
 
 describe("job", async () => {
   let api: ApiPromise;
-  let keyring: any;
-  let alice: any;
-  let bob: any;
-  let charlie: any;
-  let dave: any;
-  let amountToSend: any;
+  let keyring: Keyring;
+  let alice: KeyringPair;
+  let bob: KeyringPair;
+  let charlie: KeyringPair;
+  let dave: KeyringPair;
+  let amountToSend: BN;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
   const manifestHash =
@@ -260,12 +261,12 @@ describe("job", async () => {
     assert.isAbove(
       Number(balanceOfCharlieAfter.data.free),
       Number(balanceOfCharlieBefore.data.free),
-      "charlie should "
+      "charlie should have more funds"
     );
     assert.isAbove(
       Number(balanceOfDaveAfter.data.free),
       Number(balanceOfDaveBefore.data.free),
-      "charlie should "
+      "charlie should have more funds"
     );
     assert.isBelow(
       Number(balanceOfJobBefore),

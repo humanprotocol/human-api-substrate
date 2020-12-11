@@ -2,14 +2,15 @@ import { Job, setup, JobReads } from "../src/index";
 import BN from "bn.js";
 import manifest from "../example-manifest.json";
 import should from "should";
-import { ApiPromise } from "@polkadot/api";
+import { ApiPromise, Keyring } from "@polkadot/api";
+import { KeyringPair } from "@polkadot/keyring/types";
 const assert = require("assert");
 
 describe("Job reads", async () => {
   let api: ApiPromise;
-  let keyring: any;
+  let keyring: Keyring;
   let jobRead: JobReads;
-  let alice: any;
+  let alice: KeyringPair;
   const manifestUrl =
     "https://human-parity-is-the-best.s3.amazonaws.com/s30x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
 
@@ -78,7 +79,7 @@ describe("Job reads", async () => {
     // assumes proper manifest url already stored in S3 bucket.
     // If fails, call storage, grab the proper url and try again
     const result = await jobRead.manifest(manifestUrl);
-    assert.equal(result, JSON.stringify(manifest), "should retrieve manifest");
+    assert.deepEqual(result, manifest, "should retrieve manifest");
   });
 
   it(`fails to query intermediate results out of bounds`, async () => {

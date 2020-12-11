@@ -5,10 +5,10 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { AccountId, Balance } from "@polkadot/types/interfaces";
 
-import { Payouts } from "../interfaces";
+import { Manifest, Payouts } from "../interfaces";
 import { upload } from "../storage";
 import { EscrowId } from "../typegen/src/interfaces";
-import { Manifest, PublicKey, Results, Stake } from "../types";
+import { PublicKey } from "../types";
 import {
   formatDecimals,
   sendAndWait,
@@ -73,7 +73,7 @@ export default class Job extends JobReads {
     manifestHash: string,
     reputationOracle: AccountId | string,
     recordingOracle: AccountId | string,
-    oracleStake: Stake
+    oracleStake: BN | number
   ): Promise<Job> {
     const call: SubmittableExtrinsic<"promise"> = api.tx.escrow.create(
       manifestUrl,
@@ -94,7 +94,7 @@ export default class Job extends JobReads {
     return new Job(api, sender, id);
   }
 
-  async fundEscrow(escrowAddress: AccountId, amount: Balance | BN | number) {
+  async fundEscrow(escrowAddress: AccountId | string, amount: Balance | BN | number) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.balances.transfer(
       escrowAddress,
       amount
@@ -106,7 +106,7 @@ export default class Job extends JobReads {
     });
   }
 
-  async addTrustedHandlers(handlers: Array<AccountId>) {
+  async addTrustedHandlers(handlers: Array<AccountId> | Array<string>) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(
       this.escrowId,
       handlers
@@ -132,8 +132,9 @@ export default class Job extends JobReads {
     });
   }
 
-  async storeFinalResults(results: Results, pubKey?: PublicKey) {
+  async storeFinalResults(results: any, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
+
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.storeFinalResults(
       this.escrowId,
       resultInfo.url,
@@ -173,7 +174,7 @@ export default class Job extends JobReads {
     });
   }
 
-  async noteIntermediateResults(results: Results, pubKey?: PublicKey) {
+  async noteIntermediateResults(results: any, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.noteIntermediateResults(
       this.escrowId,
