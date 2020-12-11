@@ -222,6 +222,34 @@ describe("job", async () => {
       "escrow should be paid"
     );
   });
+  it("does a bulk payout load test", async () => {
+    const job = await Job.createEscrow(
+      api,
+      alice,
+      manifestUrl,
+      manifestHash,
+      manifest.reputation_oracle_addr,
+      manifest.recording_oracle_addr,
+      new BN("5")
+    );
+
+    const escrowBefore = await job.escrow();
+
+    await job.fundEscrow(escrowBefore.account, formatDecimals(api, 10));
+    const payout: Payouts = {
+      addresses: Array(100).fill(bob.address),
+      amounts: Array(100).fill(formatDecimals(api, 0.1)),
+    };
+    await job.bulkPayout(payout);
+
+    const escrow = await job.escrow();
+
+    mockData.end_time = Number(escrow.end_time);
+    mockData.account = escrow.account.toString();
+    mockData.status = "Paid";
+
+    assert.deepEqual(escrow.toJSON(), mockData, "escrow should be paid");
+  });
   it("does a bulk payout with results not full payout", async () => {
     const job = await Job.createEscrow(
       api,
