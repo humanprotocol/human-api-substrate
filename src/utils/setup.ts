@@ -6,8 +6,8 @@ import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { Setup } from "../interfaces";
 import * as definitions from "../typegen/src/interfaces/definitions";
 
-export default async (): Promise<Setup> => {
-  const wsProvider = new WsProvider("ws://127.0.0.1:9944");
+export default async (endpoint?: string): Promise<Setup> => {
+  const wsProvider = endpoint ? new WsProvider(endpoint) : new WsProvider("ws://127.0.0.1:9944");
   const types = Object.values(definitions).reduce(
     (res, { types }): any => ({ ...res, ...types }),
     {}
