@@ -34,10 +34,14 @@ describe("utils", async () => {
     );
   });
   it("should allow setup to pass in a new endpoint", async function () {
-    const newSetup = await setup("wss://rpc.polkadot.io")
-    const newApi = newSetup.api
-    const chain = await newApi.rpc.system.chain()
-    assert.equal(chain.toString(), "Polkadot", "should be connected to polkadot")
-    newApi.disconnect()
-  })
+    const newSetup = await setup("wss://rpc.polkadot.io");
+    const newApi = newSetup.api;
+    const chain = await newApi.rpc.system.chain();
+    assert.equal(
+      chain.toString(),
+      "Polkadot",
+      "should be connected to polkadot"
+    );
+    newApi.disconnect();
+  });
 });
