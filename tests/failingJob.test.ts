@@ -38,25 +38,25 @@ describe("failing job", async () => {
     api.disconnect();
   });
 
-  it(`fails to create escrow`, async () => {
-    try {
-      await Job.createEscrow(
-        api,
-        eve,
-        manifestUrl,
-        manifestHash,
-        manifest.reputation_oracle_addr,
-        manifest.recording_oracle_addr,
-        new BN("5")
-      );
-      should.fail("no error was thrown when it should have been", "");
-    } catch (e) {
-      assert.equal(
-        e.message,
-        "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
-      );
-    }
-  });
+  // it(`fails to create escrow`, async () => {
+  //   try {
+  //     await Job.createEscrow(
+  //       api,
+  //       eve,
+  //       manifestUrl,
+  //       manifestHash,
+  //       manifest.reputation_oracle_addr,
+  //       manifest.recording_oracle_addr,
+  //       new BN("5")
+  //     );
+  //     should.fail("no error was thrown when it should have been", "");
+  //   } catch (e) {
+  //     assert.equal(
+  //       e.message,
+  //       "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
+  //     );
+  //   }
+  // });
 
   it("funds escrow", async () => {
     const job = new Job(api, alice, api.createType("EscrowId", 1));
@@ -71,17 +71,17 @@ describe("failing job", async () => {
       );
     }
   });
-  it("fails launch on create escrow", async () => {
-    try {
-      await Job.launch(api, eve, manifest);
-      should.fail("no error was thrown when it should have been", "");
-    } catch (e) {
-      assert.equal(
-        e.message,
-        "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
-      );
-    }
-  });
+  // it("fails launch on create escrow", async () => {
+  //   try {
+  //     await Job.launch(api, eve, manifest);
+  //     should.fail("no error was thrown when it should have been", "");
+  //   } catch (e) {
+  //     assert.equal(
+  //       e.message,
+  //       "1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low"
+  //     );
+  //   }
+  // });
 
   it("fails launch on funding escrow", async () => {
     manifest.task_bid_price = "10";
@@ -127,29 +127,29 @@ describe("failing job", async () => {
       );
     }
   });
-  it("fails to add trusted handler no money in account", async () => {
-    const job = await Job.createEscrow(
-      api,
-      alice,
-      manifestUrl,
-      manifestHash,
-      manifest.reputation_oracle_addr,
-      manifest.recording_oracle_addr,
-      new BN("5")
-    );
+  // it("fails to add trusted handler no money in account", async () => {
+  //   const job = await Job.createEscrow(
+  //     api,
+  //     alice,
+  //     manifestUrl,
+  //     manifestHash,
+  //     manifest.reputation_oracle_addr,
+  //     manifest.recording_oracle_addr,
+  //     new BN("5")
+  //   );
 
-    const handlers = [charlie.address, dave.address];
-    const eveJob = await new Job(api, eve, job.escrowId);
-    try {
-      await eveJob.addTrustedHandlers(handlers);
-      should.fail("no error was thrown when it should have been", "");
-    } catch (e) {
-      assert.equal(
-        e.message,
-        `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`
-      );
-    }
-  });
+  //   const handlers = [charlie.address, dave.address];
+  //   const eveJob = await new Job(api, eve, job.escrowId);
+  //   try {
+  //     await eveJob.addTrustedHandlers(handlers);
+  //     should.fail("no error was thrown when it should have been", "");
+  //   } catch (e) {
+  //     assert.equal(
+  //       e.message,
+  //       `1010: Invalid Transaction: Inability to pay some fees , e.g. account balance too low`
+  //     );
+  //   }
+  // });
   it("fails to bulk payout", async () => {
     const job = await Job.createEscrow(
       api,
