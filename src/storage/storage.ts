@@ -13,6 +13,12 @@ const bucketName: string = process.env.bucket_name
   ? process.env.bucket_name
   : " ";
 
+/**
+ *
+ * @param data data to upload to s3
+ * @param pubKey optional key to encrypt the upload with
+ * @returns hash of data and url of storage location
+ */
 export const upload = async (
   data: any,
   pubKey?: string
@@ -22,7 +28,7 @@ export const upload = async (
   const Key = `s3${computedHash}`;
   const params: AWS.S3.Types.PutObjectRequest = {
     Bucket: bucketName.toString(),
-    Key, // File name you want to save as in S3
+    Key,
     Body: JSON.stringify(data),
     ContentType: "application/json; charset=utf-8",
     // ACL: 'public-read', TODO decide if this needs to go in
@@ -43,6 +49,12 @@ export const upload = async (
   };
 };
 
+/**
+ *
+ * @param url url to retrieve data from s3
+ * @param privKey optional decryption key if data is encrypted
+ * @returns stringified data
+ */
 export const download = async (
   url: string,
   privKey?: PrivateKey
