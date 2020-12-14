@@ -24,7 +24,8 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Launches a new job by uploading the manifest and creating an escrow instance on-chain.
+   * Will also fund the escrow and return the Job instance.
    * @param api object for interacting with the chain
    * @param sender sender of the transaction to create the escrow
    * @param manifest The manifest to derive the information to create the escrow
