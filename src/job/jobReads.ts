@@ -16,6 +16,7 @@ export default class JobReads {
     this.escrowId = escrowId;
     this.storedIntermediateResults = [];
   }
+
   /**
    * @returns the escrow info object
    */

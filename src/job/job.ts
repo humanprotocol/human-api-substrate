@@ -101,6 +101,7 @@ export default class Job extends JobReads {
 
     return new Job(api, sender, id);
   }
+
   /**
    *
    * @param escrowAddress the address associated with the escrow
@@ -120,6 +121,7 @@ export default class Job extends JobReads {
       name: "Transfer",
     });
   }
+
   /**
    *
    * @param handlers an array of handlers to add
@@ -134,6 +136,7 @@ export default class Job extends JobReads {
       throw new Error(e.message);
     });
   }
+
   /**
    *
    * @param payouts a payout object to determine the addresses and amount to payout to
@@ -152,6 +155,7 @@ export default class Job extends JobReads {
       throw new Error(e.message);
     });
   }
+
   /**
    *
    * @param results the results object
@@ -198,6 +202,7 @@ export default class Job extends JobReads {
       throw new Error(e.message);
     });
   }
+
   /**
    *
    * @param results the results object
