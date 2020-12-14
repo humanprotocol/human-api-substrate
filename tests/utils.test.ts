@@ -33,6 +33,7 @@ describe("utils", async () => {
       "balance should be converted properly"
     );
   });
+  // Note: Will fail if Polkadot RPC is not available
   it("should allow setup to pass in a new endpoint", async function () {
     const newSetup = await setup("wss://rpc.polkadot.io");
     const newApi = newSetup.api;
