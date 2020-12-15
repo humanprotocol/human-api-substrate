@@ -71,16 +71,18 @@ const job = await Job.createEscrow(
   recordingOracleStake
 );
 ```
+
 ### Launching a job from a manifest
 
-* you can launch a job from only the manifest
-* this will also upload the manifest to s3 so this requires a proper .env
+- you can launch a job from only the manifest
+- this will also upload the manifest to s3 so this requires a proper .env
 
 ```javascript
-    const job = await Job.launch(api, wallet, manifest);
+const job = await Job.launch(api, wallet, manifest);
 ```
+
 ## Error handling
 
-* the library passes errors down to the user
-* handling should be the responsibility of the integrator
-* we recommend wrapping calls in a try catch and handling how to properly handle these errors
+- the library passes errors down to the user
+- handling should be the responsibility of the integrator
+- we recommend wrapping calls in a try catch and handling how to properly handle these errors
