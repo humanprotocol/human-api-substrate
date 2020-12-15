@@ -8,14 +8,17 @@ import { blake2AsHex } from "@polkadot/util-crypto";
 import { EventFilter } from "../interfaces";
 
 /**
- * Get the decimals of the main currency on chain
+ * @param api api object
+ * @returns decimals of the main currency on chain
  */
 export const getDecimals = (api: ApiPromise): number => {
   return api.registry.chainDecimals;
 };
 
 /**
- * Format `amount` according to/multiply by the decimals of the main currency on chain.
+ * @param api api object
+ * @param amount the amount
+ * @returns the format `amount` according to/multiply by the decimals of the main currency on chain.
  */
 export const formatDecimals = (api: ApiPromise, amount: number): BN => {
   return new BN(amount * 10 ** getDecimals(api));
@@ -27,6 +30,7 @@ export const formatDecimals = (api: ApiPromise, amount: number): BN => {
  * @param call a call that can be submitted to the chain
  * @param sender the sender of the transaction
  * @param filter which event to filter for
+ * @returns event that fits the filter
  */
 export function sendAndWaitFor(
   api: ApiPromise,
@@ -105,6 +109,11 @@ export function sendAndWait(
   });
 }
 
+/**
+ *
+ * @param data the data to be hashed
+ * @returns the hashed string
+ */
 export const hash = (data: Uint8Array | string): string => {
   return blake2AsHex(data);
 };

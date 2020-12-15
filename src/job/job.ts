@@ -23,6 +23,15 @@ export default class Job extends JobReads {
     this.sender = sender;
   }
 
+  /**
+   * Launches a new job by uploading the manifest and creating an escrow instance on-chain.
+   * Will also fund the escrow and return the Job instance.
+   * @param api object for interacting with the chain
+   * @param sender sender of the transaction to create the escrow
+   * @param manifest The manifest to derive the information to create the escrow
+   * @param pubKey optional pub key to encrypt the manifest
+   * @returns a new Job class
+   */
   static async launch(
     api: ApiPromise,
     sender: KeyringPair,
@@ -64,6 +73,7 @@ export default class Job extends JobReads {
    * @param reputationOracle account id of the reputation oracle
    * @param recordingOracle account id of the recording oracle
    * @param oracleStake oracle fees
+   * @returns a new Job class
    */
   static async createEscrow(
     api: ApiPromise,
@@ -93,6 +103,11 @@ export default class Job extends JobReads {
     return new Job(api, sender, id);
   }
 
+  /**
+   *
+   * @param escrowAddress the address associated with the escrow
+   * @param amount the amount to fund the escrow with
+   */
   async fundEscrow(
     escrowAddress: AccountId | string,
     amount: Balance | BN | number
@@ -108,6 +123,10 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   *
+   * @param handlers an array of handlers to add
+   */
   async addTrustedHandlers(handlers: Array<AccountId> | Array<string>) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.addTrustedHandlers(
       this.escrowId,
@@ -119,6 +138,10 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   *
+   * @param payouts a payout object to determine the addresses and amount to payout to
+   */
   async bulkPayout(payouts: Payouts) {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.bulkPayout(
       this.escrowId,
@@ -134,6 +157,11 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   *
+   * @param results the results object
+   * @param pubKey optional pub key to encrypt the results with
+   */
   async storeFinalResults(results: any, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
 
@@ -176,6 +204,11 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   *
+   * @param results the results object
+   * @param pubKey optional pub key to encrypt the results with
+   */
   async noteIntermediateResults(results: any, pubKey?: PublicKey) {
     const resultInfo = await upload(results, pubKey);
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.noteIntermediateResults(

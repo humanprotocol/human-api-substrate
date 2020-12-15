@@ -6,6 +6,10 @@ import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { Setup } from "../interfaces";
 import * as definitions from "../typegen/src/interfaces/definitions";
 
+/**
+ * @param endpoint optional endpoint to override default localhost
+ * @returns api object and keyring object
+ */
 export default async (endpoint?: string): Promise<Setup> => {
   const wsProvider = endpoint
     ? new WsProvider(endpoint)

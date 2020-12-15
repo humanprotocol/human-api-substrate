@@ -17,6 +17,9 @@ export default class JobReads {
     this.storedIntermediateResults = [];
   }
 
+  /**
+   * @returns the escrow info object
+   */
   async escrow(): Promise<EscrowInfo> {
     const escrow = await this.api.query.escrow.escrows(this.escrowId);
 
@@ -26,8 +29,8 @@ export default class JobReads {
   /**
    *
    * @param address the address of the account queried
-   * @return Boolean
-   * @dev Retrieves if the address is a trusted handler from the escrow instance
+   * @returns boolean
+   * @dev retrieves if the address is a trusted handler from the escrow instance
    */
   async isTrustedHandler(address: AccountId | string): Promise<boolean> {
     const isTrustedHandler = await this.api.query.escrow.trustedHandlers(
@@ -49,8 +52,8 @@ export default class JobReads {
   }
 
   /**
+   * @param manifestUrl the url of the manifest to return
    * @param privKey private key of user who encrypted manifest
-   * @param manifestUrl The url of the manifest to return
    * @returns the plain text manifest or error if can't decrypt
    */
   async manifest(url: string, privKey?: PrivateKey): Promise<Manifest> {
@@ -59,9 +62,9 @@ export default class JobReads {
 
   /**
    *
-   * @param privKey Private Key of encrypted data
    * @param index index of intermediate result to get
-   * @returns The manifest or error if can't decrypt
+   * @param privKey private Key of encrypted data
+   * @returns the manifest or error if can't decrypt
    */
   public async intermediateResults(
     index: any,
@@ -77,8 +80,8 @@ export default class JobReads {
 
   /**
    *
-   * @param privKey Private Key of encrypted data
-   * @returns The manifest, error if can't decrypt error if no final results
+   * @param privKey private Key of encrypted data
+   * @returns the manifest, error if can't decrypt error if no final results
    */
   public async finalResults(privKey?: PrivateKey): Promise<any> {
     // TODO get proper type from polkadot js
