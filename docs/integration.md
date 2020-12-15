@@ -18,7 +18,8 @@ bucket_name=
 ## Setup
 
 - To launch any jobs you need an api instance which will serve as a websocket connection to your node. You should create this once with the setup function and pass this into your jobs (you can reuse the connection in multiple jobs)
-- To launch any jobs that have writes you will need to create a wallet object which can be created with the keyring object returned from the setup function
+- To launch any jobs that have writes you will need to create a keyring pair object which can be created with the keyring object returned from the setup function
+- For more information about the [api](https://polkadot.js.org/docs/api) or the [keyring](https://polkadot.js.org/docs/keyring)
 
 ```javascript
 	import { Job, JobReads, setup } from "../src/index";
@@ -29,8 +30,8 @@ bucket_name=
 	//connection to non default endpoint
     //const {api, keyring} = await setup("wss://rpc.polkadot.io");
 
-	// wallet object
-	const alice = keyring.addFromUri(<Secret>);
+	// keyring pair object
+	const keyringPair = keyring.addFromUri(<Secret>);
 
 ```
 
@@ -52,7 +53,7 @@ const jobRead = new JobReads(api, escrowId);
 - you can launch a job that can write to an already launched escrow instance
 
 ```javascript
-const job = new Job(api, wallet, escrowId);
+const job = new Job(api, keyringPair, escrowId);
 ```
 
 ### Launching a job with the proper information
@@ -62,7 +63,7 @@ const job = new Job(api, wallet, escrowId);
 ```javascript
 const job = await Job.createEscrow(
   api,
-  wallet,
+  keyringPair,
   manifestUrl,
   manifestHash,
   reputationOracleAddress,
@@ -78,7 +79,7 @@ const job = await Job.createEscrow(
 - this will also upload the manifest to s3 so this requires a proper .env
 
 ```javascript
-const job = await Job.launch(api, wallet, manifest);
+const job = await Job.launch(api, keyringPair, manifest);
 ```
 
 ## Error handling
