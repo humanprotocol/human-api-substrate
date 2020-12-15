@@ -63,10 +63,10 @@ const job = new Job(api, keyringPair, escrowId);
 ```javascript
 // example manifest hash and url
 const manifestHash =
-"0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
+  "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
 const manifestUrl =
-	"https://human-parity-is-the-best.s3.amazonaws.com/s3" + manifestHash;
-	
+  "https://human-parity-is-the-best.s3.amazonaws.com/s3" + manifestHash;
+
 const job = await Job.createEscrow(
   api,
   keyringPair,
