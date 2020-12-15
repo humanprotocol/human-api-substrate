@@ -32,6 +32,7 @@ bucket_name=
 
 	// keyring pair object
 	const keyringPair = keyring.addFromUri(<Secret>);
+```
 
 ## Launching a Job
 
