@@ -25,15 +25,13 @@ bucket_name=
 	import { Job, JobReads, setup } from "../src/index";
 
 	// return the api and keyring from setup will return the default local host connection to api
-	 const {api, keyring} = await setup();
+	const {api, keyring} = await setup();
 
-	//connection to non default endpoint
-    //const {api, keyring} = await setup("wss://rpc.polkadot.io");
+	// connection to non default endpoint
+	//const {api, keyring} = await setup("wss://rpc.polkadot.io");
 
 	// keyring pair object
 	const keyringPair = keyring.addFromUri(<Secret>);
-
-```
 
 ## Launching a Job
 
