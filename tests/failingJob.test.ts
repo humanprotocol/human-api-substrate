@@ -47,6 +47,7 @@ describe("failing job", async () => {
         manifestHash,
         manifest.reputation_oracle_addr,
         manifest.recording_oracle_addr,
+        new BN("5"),
         new BN("5")
       );
       should.fail("no error was thrown when it should have been", "");
@@ -112,6 +113,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -135,6 +137,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -158,6 +161,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -184,6 +188,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -208,6 +213,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -234,6 +240,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -260,6 +267,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -284,6 +292,7 @@ describe("failing job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 

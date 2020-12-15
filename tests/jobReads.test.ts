@@ -31,6 +31,7 @@ describe("Job reads", async () => {
       manifestHash,
       bob.address,
       charlie.address,
+      new BN(10),
       new BN(10)
     );
     jobRead = new JobReads(api, job.escrowId);

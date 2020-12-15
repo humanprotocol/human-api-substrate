@@ -51,6 +51,7 @@ export default class Job extends JobReads {
       manifestInfo.hash,
       reputationOracle,
       recordingOracle,
+      oracleStake,
       oracleStake
     );
     const escrow = await job.escrow();
@@ -72,7 +73,8 @@ export default class Job extends JobReads {
    * @param manifestHash
    * @param reputationOracle account id of the reputation oracle
    * @param recordingOracle account id of the recording oracle
-   * @param oracleStake oracle fees
+   * @param reputationOracleStake reputation oracle fees
+   * @param recordingOracleStake recording oracle fees
    * @returns a new Job class
    */
   static async createEscrow(
@@ -82,15 +84,16 @@ export default class Job extends JobReads {
     manifestHash: string,
     reputationOracle: AccountId | string,
     recordingOracle: AccountId | string,
-    oracleStake: BN | number
+    reputationOracleStake: BN | number,
+    recordingOracleStake: BN | number
   ): Promise<Job> {
     const call: SubmittableExtrinsic<"promise"> = api.tx.escrow.create(
       manifestUrl,
       manifestHash,
       reputationOracle,
       recordingOracle,
-      oracleStake,
-      oracleStake
+      reputationOracleStake,
+      recordingOracleStake
     );
     const record = await sendAndWaitFor(api, call, sender, {
       section: "escrow",

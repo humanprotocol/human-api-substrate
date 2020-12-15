@@ -58,6 +58,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
     const escrow = await job.escrow();
@@ -95,6 +96,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
     const amountToSend = formatDecimals(api, 10);
@@ -115,6 +117,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
     const amountToSend = formatDecimals(api, 10);
@@ -136,6 +139,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
     const escrowBefore = await job.escrow();
@@ -155,6 +159,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
     const results = { results: true };
@@ -174,6 +179,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -231,6 +237,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -259,6 +266,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
@@ -323,6 +331,7 @@ describe("job", async () => {
       manifestHash,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
+      new BN("5"),
       new BN("5")
     );
 
