@@ -44,7 +44,20 @@ Escrows are created in the `Pending` state and are initially open for data. Whil
 `Partial`) they can still be cancelled or aborted. Once the escrow is paid it transitions into the
 corresponding `Paid` state and can be marked as `Complete`d.
 
-## Conceptual Differences to Solidity Implementation
+## Differences to Solidity Implementation
 
 This implementation skips the `Launched` state present in the Solidity version because the distinction
 between contract creation and setup falls away.
+
+The bulk payout in this implementation is transactional, i.e. if any of the transfers fail, the whole
+transaction fails and needs to be resubmitted (with modification to make it succeed). This guarantees
+the consistency of the state.
+
+Furthermore the Substrate implementation differs by virtue of being a complete blockchain built on a
+framework:
+
+| Topic          | Substrate                            | Ethereum                             |
+| -------------- | ---                                  | ---                                  |
+| Token          | own base-level HMT token             | ERC-20 token contract                |
+| Fees           | flexible fee structure: feeless or fees payed in HMT  | fees in ETH         |
+| Execution      | Wasm, JIT-compiled                   | EVM                                  |
