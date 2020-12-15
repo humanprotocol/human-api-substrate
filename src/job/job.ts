@@ -51,7 +51,7 @@ export default class Job extends JobReads {
       manifestInfo.hash,
       reputationOracle,
       recordingOracle,
-      oracleStake, 
+      oracleStake,
       oracleStake
     );
     const escrow = await job.escrow();

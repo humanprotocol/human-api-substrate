@@ -59,7 +59,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-      new BN("5"),
+      new BN("5")
     );
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
@@ -97,8 +97,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
     const amountToSend = formatDecimals(api, 10);
     const escrow = await job.escrow();
@@ -119,8 +118,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
     const amountToSend = formatDecimals(api, 10);
     const escrowBefore = await job.escrow();
@@ -142,8 +140,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
     const escrowBefore = await job.escrow();
     await job.fundEscrow(escrowBefore.account, amountToSend);
@@ -163,8 +160,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
     const results = { results: true };
     await job.noteIntermediateResults(results);
@@ -184,8 +180,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
 
     const escrowBefore = await job.escrow();
@@ -243,8 +238,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
 
     const escrowBefore = await job.escrow();
@@ -273,8 +267,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
 
     const escrowBefore = await job.escrow();
@@ -339,8 +332,7 @@ describe("job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
-
+      new BN("5")
     );
 
     const handlers = [charlie.address, dave.address];

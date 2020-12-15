@@ -48,7 +48,7 @@ describe("failing job", async () => {
         manifest.reputation_oracle_addr,
         manifest.recording_oracle_addr,
         new BN("5"),
-        new BN("5"),
+        new BN("5")
       );
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
@@ -114,7 +114,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const handlers = [charlie.address, dave.address];
@@ -138,7 +138,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const handlers = [charlie.address, dave.address];
@@ -162,7 +162,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
@@ -189,7 +189,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
@@ -214,7 +214,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
@@ -241,7 +241,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
@@ -268,7 +268,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
@@ -293,7 +293,7 @@ describe("failing job", async () => {
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
-            new BN("5")
+      new BN("5")
     );
 
     const bobJob = await new Job(api, bob, job.escrowId);
