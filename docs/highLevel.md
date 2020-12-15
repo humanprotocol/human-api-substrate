@@ -56,8 +56,8 @@ the consistency of the state.
 Furthermore the Substrate implementation differs by virtue of being a complete blockchain built on a
 framework:
 
-| Topic          | Substrate                            | Ethereum                             |
-| -------------- | ---                                  | ---                                  |
-| Token          | own base-level HMT token             | ERC-20 token contract                |
-| Fees           | flexible fee structure: feeless or fees payed in HMT  | fees in ETH         |
-| Execution      | Wasm, JIT-compiled                   | EVM                                  |
+| Topic     | Substrate                                            | Ethereum              |
+| --------- | ---------------------------------------------------- | --------------------- |
+| Token     | own base-level HMT token                             | ERC-20 token contract |
+| Fees      | flexible fee structure: feeless or fees payed in HMT | fees in ETH           |
+| Execution | Wasm, JIT-compiled                                   | EVM                   |
