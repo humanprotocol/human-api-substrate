@@ -11,6 +11,11 @@ export default class JobReads {
   escrowId: EscrowId;
   storedIntermediateResults: any[];
 
+  /**
+   * Construct a read-only object for interacting with the escrow identified by the id.
+   * @param api polkadot-js api object
+   * @param escrowId id of the escrow to interact with
+   */
   constructor(api: ApiPromise, escrowId: EscrowId | number) {
     this.api = api;
 
@@ -88,7 +93,7 @@ export default class JobReads {
   /**
    *
    * @param privKey private Key of encrypted data
-   * @returns the manifest, error if can't decrypt error if no final results
+   * @returns the manifest, error if can't decrypt or if no final results
    */
   public async finalResults(privKey?: PrivateKey): Promise<any> {
     // TODO get proper type from polkadot js
