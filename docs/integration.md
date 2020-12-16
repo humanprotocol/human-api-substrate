@@ -1,4 +1,5 @@
 # Integration
+
 Integration works via pulling in the `hmt-js` typescript library which connects to the blockchain node.
 
 ## .env
@@ -12,9 +13,10 @@ bucket_name=
 ```
 
 The library can be used without this info except for
-  - launch job
-  - any read call that requires the download functionality
-  - any write call that requires the upload functionality
+
+- launch job
+- any read call that requires the download functionality
+- any write call that requires the upload functionality
 
 ## Setup
 
@@ -69,9 +71,12 @@ You can create a new job by passing in the required information.
 
 ```javascript
 // example manifest hash and url
-const manifestHash = "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
-const manifestUrl = "https://human-parity-is-the-best.s3.amazonaws.com/s3" + manifestHash;
-const reputationOracleAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+const manifestHash =
+  "0x251015a125f7d34f924ac5ac848f120b659f09863e4e355641420f56425833b5";
+const manifestUrl =
+  "https://human-parity-is-the-best.s3.amazonaws.com/s3" + manifestHash;
+const reputationOracleAddress =
+  "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
 const reputationOracleAddress = recordingOracleAddress;
 const reputationOracleStake = 5;
 const recordingOracleStake = reputationOracleStake;
@@ -114,8 +119,8 @@ const bob = keyring.addFromUri("//Bob");
 const charlieAddress = "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y";
 const payouts = {
   addresses: [bob.address, charlieAddress],
-  amounts: [200, 400]
-}
+  amounts: [200, 400],
+};
 await job.bulkPayout(payouts);
 ```
 

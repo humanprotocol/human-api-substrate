@@ -24,7 +24,11 @@ export default class Job extends JobReads {
    * @param sender keyring pair for signing messages
    * @param escrowId id of the escrow to interact with
    */
-  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId | number) {
+  constructor(
+    api: ApiPromise,
+    sender: KeyringPair,
+    escrowId: EscrowId | number
+  ) {
     super(api, escrowId);
     this.sender = sender;
   }
