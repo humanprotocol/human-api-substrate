@@ -40,6 +40,11 @@ describe("Job reads", async () => {
     api.disconnect();
   });
 
+  it(`allows constructing from number`, async () => {
+    const jobReadFromNum = new JobReads(api, jobRead.escrowId.toNumber());
+    await jobReadFromNum.escrow();
+  });
+
   it(`queries escrow`, async () => {
     const escrow = await jobRead.escrow();
     const mockData = {

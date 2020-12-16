@@ -18,7 +18,7 @@ import JobReads from "./jobReads";
 export default class Job extends JobReads {
   sender: KeyringPair;
 
-  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
+  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId | number) {
     super(api, escrowId);
     this.sender = sender;
   }

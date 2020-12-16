@@ -11,9 +11,16 @@ export default class JobReads {
   escrowId: EscrowId;
   storedIntermediateResults: any[];
 
-  constructor(api: ApiPromise, escrowId: EscrowId) {
+  constructor(api: ApiPromise, escrowId: EscrowId | number) {
     this.api = api;
-    this.escrowId = escrowId;
+
+    // only reasonable way to check the difference between `EscrowId` and `number`
+    if (typeof escrowId === "number") {
+      this.escrowId = api.createType("EscrowId", escrowId);
+    } else {
+      this.escrowId = escrowId;
+    }
+
     this.storedIntermediateResults = [];
   }
 
