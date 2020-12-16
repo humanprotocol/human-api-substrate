@@ -11,9 +11,21 @@ export default class JobReads {
   escrowId: EscrowId;
   storedIntermediateResults: any[];
 
-  constructor(api: ApiPromise, escrowId: EscrowId) {
+  /**
+   * Construct a read-only object for interacting with the escrow identified by the id.
+   * @param api polkadot-js api object
+   * @param escrowId id of the escrow to interact with
+   */
+  constructor(api: ApiPromise, escrowId: EscrowId | number) {
     this.api = api;
-    this.escrowId = escrowId;
+
+    // only reasonable way to check the difference between `EscrowId` and `number`
+    if (typeof escrowId === "number") {
+      this.escrowId = api.createType("EscrowId", escrowId);
+    } else {
+      this.escrowId = escrowId;
+    }
+
     this.storedIntermediateResults = [];
   }
 
@@ -81,7 +93,7 @@ export default class JobReads {
   /**
    *
    * @param privKey private Key of encrypted data
-   * @returns the manifest, error if can't decrypt error if no final results
+   * @returns the manifest, error if can't decrypt or if no final results
    */
   public async finalResults(privKey?: PrivateKey): Promise<any> {
     // TODO get proper type from polkadot js

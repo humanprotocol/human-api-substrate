@@ -18,7 +18,17 @@ import JobReads from "./jobReads";
 export default class Job extends JobReads {
   sender: KeyringPair;
 
-  constructor(api: ApiPromise, sender: KeyringPair, escrowId: EscrowId) {
+  /**
+   * Construct a new Job instance to interact with the escrow on chain identified by the id.
+   * @param api polkadot-js api object
+   * @param sender keyring pair for signing messages
+   * @param escrowId id of the escrow to interact with
+   */
+  constructor(
+    api: ApiPromise,
+    sender: KeyringPair,
+    escrowId: EscrowId | number
+  ) {
     super(api, escrowId);
     this.sender = sender;
   }
@@ -107,7 +117,7 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Transfer funds from the job creator to the job's escrow account.
    * @param escrowAddress the address associated with the escrow
    * @param amount the amount to fund the escrow with
    */
@@ -127,7 +137,7 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Add the given accounts as trusted handlers (privileged accounts).
    * @param handlers an array of handlers to add
    */
   async addTrustedHandlers(handlers: Array<AccountId> | Array<string>) {
@@ -142,7 +152,7 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Pay out the given amounts to the specified accounts, subtracting oracle fees.
    * @param payouts a payout object to determine the addresses and amount to payout to
    */
   async bulkPayout(payouts: Payouts) {
@@ -161,7 +171,7 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Upload results to S3 and store the url and hash on-chain.
    * @param results the results object
    * @param pubKey optional pub key to encrypt the results with
    */
@@ -181,6 +191,9 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   * Abort the escrow process. Funds will be refunded.
+   */
   async abort() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.abort(
       this.escrowId
@@ -194,6 +207,9 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   * Set the escrow to cancelled and refund any remaining funds.
+   */
   async cancel() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.cancel(
       this.escrowId
@@ -208,7 +224,8 @@ export default class Job extends JobReads {
   }
 
   /**
-   *
+   * Upload results to S3 and emit an event with the url and hash on-chain to register the results.
+   * Note: Will not store the result on-chain in pallet storage.
    * @param results the results object
    * @param pubKey optional pub key to encrypt the results with
    */
@@ -234,6 +251,9 @@ export default class Job extends JobReads {
     });
   }
 
+  /**
+   * Mark the escrow as complete on-chain. Only possible once it is in `Paid` state.
+   */
   async complete() {
     const call: SubmittableExtrinsic<"promise"> = this.api.tx.escrow.complete(
       this.escrowId
