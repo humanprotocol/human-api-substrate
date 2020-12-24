@@ -1,0 +1,28 @@
+{
+  "name": "express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js",
+    "compile": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.9",
+    "@types/express": "^4.17.9",
+    "@types/morgan": "^1.9.2",
+    "nodemon": "^1.19.4",
+    "typescript": "^4.1.3"
+  }
+}
