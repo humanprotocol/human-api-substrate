@@ -3,8 +3,8 @@ import cors from "cors";
 import express from "express";
 import logger from "morgan";
 
+import { setup } from "../index.js";
 import routes from "./routes";
-import { setup } from "../index.js"
 
 const port = "3001";
 const app = express();
@@ -25,5 +25,5 @@ app.use("/", routes.base);
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port}!`);
-  const returned = await setup()
+  const returned: any = await setup();
 });

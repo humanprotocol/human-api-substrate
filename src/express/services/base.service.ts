@@ -1,6 +1,4 @@
-import { Job, setup, JobReads } from "../../../index";
-
-
+import { Job, JobReads, setup } from "../../../index";
 
 export const test = (req: any): string => {
   return "hello worlds";
