@@ -40,6 +40,6 @@ module.exports = {
     "comma-dangle": "off",
     "object-curly-newline": "off",
     "space-before-function-paren": "off",
-    "@typescript-eslint/no-misused-promises": "warn"
+    "@typescript-eslint/no-misused-promises": "warn",
   },
 };
