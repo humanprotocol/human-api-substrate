@@ -23,7 +23,19 @@ app.use((req: any, res: any, next: any) => {
 
 app.use("/", routes.base);
 
+declare global {
+  namespace NodeJS {
+    interface Global {
+        substrate: any,
+        keyring: any
+    }
+  }
+}
+
+
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port}!`);
   const returned: any = await setup();
+  global.substrate = returned.api
+  global.keyring = returned.keyring
 });
