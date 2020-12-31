@@ -12,14 +12,16 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "compile": "tsc",
     "prettier:fix": "prettier --write .",
-    "prettier": "prettier --check ."
+    "prettier": "prettier --check .",
+    "express": "nodemon src/express/index.js",
+    "purge": "rimraf '!(node_modules)/**/*.js'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@polkadot/typegen": "^2.10.1",
     "@polkadot/dev": "^0.60.13",
+    "@polkadot/typegen": "^2.10.1",
     "@types/expect": "^24.3.0",
     "@types/mocha": "^8.0.4",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
@@ -32,14 +34,24 @@
     "should": "^13.2.3",
     "ts-mocha": "^8.0.0",
     "ts-node": "^8.6.2",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.9",
+    "@types/express": "^4.17.9",
+    "@types/morgan": "^1.9.2",
+    "nodemon": "^1.19.4",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "@polkadot/api": "^2.10.1",
     "@polkadot/keyring": "^4.2.1",
     "@polkadot/types": "^2.10.1",
     "aws-sdk": "^2.799.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
   },
   "husky": {
     "hooks": {
