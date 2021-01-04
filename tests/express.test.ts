@@ -32,7 +32,7 @@ describe("express test", async () => {
       recordingOracle,
       reputationOracleStake,
       recordingOracleStake,
-	});
+    });
     console.log({ escrowId: returned.data.escrowId });
   });
 });
