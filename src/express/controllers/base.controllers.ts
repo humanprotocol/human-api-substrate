@@ -1,8 +1,8 @@
 import * as baseService from "../services/base.service";
 
-export const test = (req: any, res: any) => {
+export const base = async (req: any, res: any) => {
   try {
-    const data = baseService.test(req);
+    const data = await baseService.base(req);
 
     return res.status(200).send(data);
   } catch (e) {

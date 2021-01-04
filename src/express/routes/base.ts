@@ -4,6 +4,6 @@ import * as controller from "../controllers/base.controllers";
 
 const router = Router();
 
-router.get("/", controller.test);
+router.post("/", controller.base);
 
 export default router;
