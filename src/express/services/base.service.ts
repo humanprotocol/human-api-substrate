@@ -128,26 +128,26 @@ const readNoParams = async (body: any) => {
   const job = new JobReads(global.substrate, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
 
-  await job[`${functionCall}`]();
+  return await job[`${functionCall}`]();
 };
 
 const isTrustedHandler = async (body: any) => {
   const { address, escrowId } = body;
   const job = new JobReads(global.substrate, escrowId);
 
-  await job.isTrustedHandler(address);
+  return await job.isTrustedHandler(address);
 };
 
 const manifest = async (body: any) => {
   const { escrowId, url } = body;
   const job = new JobReads(global.substrate, escrowId);
 
-  await job.manifest(url);
+  return await job.manifest(url);
 };
 
 const intermediateResults = async (body: any) => {
   const { escrowId, index } = body;
   const job = new JobReads(global.substrate, escrowId);
 
-  await job.intermediateResults(index);
+  return await job.intermediateResults(index);
 };
