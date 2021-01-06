@@ -199,8 +199,7 @@ export default class Job extends JobReads {
       this.escrowId
     );
 
-    await sendAndWait(this.api, call, this.sender)
-      .catch((e) => {
+    await sendAndWait(this.api, call, this.sender).catch((e) => {
       throw new Error(e.message);
     });
   }

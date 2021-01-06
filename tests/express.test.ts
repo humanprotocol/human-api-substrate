@@ -34,37 +34,34 @@ describe("express test", async () => {
       manifest,
     });
 
-    const escrow =  await axios.post(url, {
-  		functionName: "escrow",
-  		escrowId: returned.data.escrowId,
-      seed: "//Alice",
-
-    })
-    assert.equal(escrow.data.status, "Pending")
-
-    const toSend = "2000000000000"
-    await axios.post(url, {
-  		functionName: "fundEscrow",
-  		escrowId: returned.data.escrowId,
-      seed: "//Alice",
-      amount: toSend,
-      escrowAddress: escrow.data.account
-
-    })
-
-    const returnedCancel = await axios.post(url, {
-      functionName: "cancel",
-  		escrowId: returned.data.escrowId,
-      seed: "//Alice",
-    });
-    assert.equal(returnedCancel.status, "200");
-    const escrowCanceled =  await axios.post(url, {
+    const escrow = await axios.post(url, {
       functionName: "escrow",
       escrowId: returned.data.escrowId,
       seed: "//Alice",
+    });
+    assert.equal(escrow.data.status, "Pending");
 
-    })
-    assert.equal(escrowCanceled.data.status, "Cancelled")
+    const toSend = "2000000000000";
+    await axios.post(url, {
+      functionName: "fundEscrow",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+      amount: toSend,
+      escrowAddress: escrow.data.account,
+    });
+
+    const returnedCancel = await axios.post(url, {
+      functionName: "cancel",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+    });
+    assert.equal(returnedCancel.status, "200");
+    const escrowCanceled = await axios.post(url, {
+      functionName: "escrow",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+    });
+    assert.equal(escrowCanceled.data.status, "Cancelled");
   });
 
   it(`should create an escrow and bulk payout and complete`, async () => {
@@ -79,51 +76,49 @@ describe("express test", async () => {
       recordingOracleStake,
     });
 
-    assert.equal(returned.status, "200")
-    const escrow =  await axios.post(url, {
-  		functionName: "escrow",
-  		escrowId: returned.data.escrowId,
+    assert.equal(returned.status, "200");
+    const escrow = await axios.post(url, {
+      functionName: "escrow",
+      escrowId: returned.data.escrowId,
       seed: "//Alice",
+    });
 
-    })
-
-    const toSend = "2000000000000"
+    const toSend = "2000000000000";
     const returnedFund = await axios.post(url, {
-  		functionName: "fundEscrow",
-  		escrowId: returned.data.escrowId,
+      functionName: "fundEscrow",
+      escrowId: returned.data.escrowId,
       seed: "//Alice",
       amount: toSend,
-      escrowAddress: escrow.data.account
-
-    })
-    assert.equal(returnedFund.status, "200")
+      escrowAddress: escrow.data.account,
+    });
+    assert.equal(returnedFund.status, "200");
 
     const returnedBalance = await axios.post(url, {
-  		functionName: "balance",
-  		escrowId: returned.data.escrowId,
-    })
+      functionName: "balance",
+      escrowId: returned.data.escrowId,
+    });
 
     assert.equal(toSend.toString(), returnedBalance.data.toString());
-    
+
     // console.log("funded", returnedFund)
     const payout = {
-  		addresses: [reputationOracle, reputationOracle],
-  		amounts: ["1000000000000", "1000000000000"],
-  	  };
+      addresses: [reputationOracle, reputationOracle],
+      amounts: ["1000000000000", "1000000000000"],
+    };
 
-  	const returnedBulk = await axios.post(url, {
-  		functionName: "bulkPayout",
-  		escrowId: returned.data.escrowId,
-  		seed: "//Alice",
-  		payouts: payout
-    })
+    const returnedBulk = await axios.post(url, {
+      functionName: "bulkPayout",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+      payouts: payout,
+    });
 
-    assert.equal(returnedBulk.status, "200")
+    assert.equal(returnedBulk.status, "200");
 
     const returnedBalanceAfter = await axios.post(url, {
-  		functionName: "balance",
-  		escrowId: returned.data.escrowId,
-    })
+      functionName: "balance",
+      escrowId: returned.data.escrowId,
+    });
 
     assert.equal("0", returnedBalanceAfter.data.toString());
     const returnedCompleted = await axios.post(url, {
@@ -132,16 +127,15 @@ describe("express test", async () => {
       seed: "//Alice",
     });
     assert.equal(returnedCompleted.status, "200");
-    const escrowCompleted =  await axios.post(url, {
+    const escrowCompleted = await axios.post(url, {
       functionName: "escrow",
       escrowId: returned.data.escrowId,
       seed: "//Alice",
-
-    })
-    assert.equal(escrowCompleted.data.status, "Complete")
+    });
+    assert.equal(escrowCompleted.data.status, "Complete");
   });
   it(`should add a trusted handler`, async () => {
-    const dave = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy"
+    const dave = "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy";
     const returned = await axios.post(url, {
       functionName: "addTrustedHandlers",
       escrowId,
@@ -155,8 +149,8 @@ describe("express test", async () => {
       escrowId,
       address: dave,
     });
-    
-    assert.equal(returnedAfter.data, true)
+
+    assert.equal(returnedAfter.data, true);
     assert.equal(returned.status, "200");
   });
 
@@ -166,48 +160,45 @@ describe("express test", async () => {
       functionName: "storeFinalResults",
       escrowId,
       seed: "//Alice",
-      results: finalResults
+      results: finalResults,
     });
     assert.equal(returned.status, "200");
     const returnedfinalResults = await axios.post(url, {
       functionName: "finalResults",
       escrowId,
       seed: "//Alice",
-      results: finalResults
+      results: finalResults,
     });
 
-    assert.deepEqual(returnedfinalResults.data, finalResults)
-
-});
-it(`should abort`, async () => {
-  const returned = await axios.post(url, {
-    functionName: "createEscrow",
-    seed: "//Alice",
-    manifestUrl,
-    manifestHash,
-    reputationOracle,
-    recordingOracle,
-    reputationOracleStake,
-    recordingOracleStake,
+    assert.deepEqual(returnedfinalResults.data, finalResults);
   });
+  it(`should abort`, async () => {
+    const returned = await axios.post(url, {
+      functionName: "createEscrow",
+      seed: "//Alice",
+      manifestUrl,
+      manifestHash,
+      reputationOracle,
+      recordingOracle,
+      reputationOracleStake,
+      recordingOracleStake,
+    });
 
-  const returnedAbort = await axios.post(url, {
-    functionName: "abort",
-    escrowId: returned.data.escrowId,
-    seed: "//Alice",
-  });
-
-  assert.equal(returnedAbort.status, "200");
-  try {
-    await axios.post(url, {
-      functionName: "escrow",
+    const returnedAbort = await axios.post(url, {
+      functionName: "abort",
       escrowId: returned.data.escrowId,
       seed: "//Alice",
-  
-    })
+    });
 
-  } catch (e) {
-    assert.equal(e.response.data, "Option: unwrapping a None value")
-  }
-});
+    assert.equal(returnedAbort.status, "200");
+    try {
+      await axios.post(url, {
+        functionName: "escrow",
+        escrowId: returned.data.escrowId,
+        seed: "//Alice",
+      });
+    } catch (e) {
+      assert.equal(e.response.data, "Option: unwrapping a None value");
+    }
+  });
 });
