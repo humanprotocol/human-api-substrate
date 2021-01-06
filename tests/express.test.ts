@@ -169,8 +169,26 @@ describe("express test", async () => {
       seed: "//Alice",
       results: finalResults,
     });
+  });
+  it(`should note intermediate results`, async () => {
+    const intermediateResults = { results: "intermediate" };
+    const returned = await axios.post(url, {
+      functionName: "noteIntermediateResults",
+      escrowId,
+      seed: "//Alice",
+      results: intermediateResults,
+    });
+    assert.equal(returned.status, "200");
+  });
 
-    assert.deepEqual(returnedfinalResults.data, finalResults);
+  it(`should get manifest`, async () => {
+    const returned = await axios.post(url, {
+      functionName: "manifest",
+      seed: "//Alice",
+      url: manifestUrl,
+    });
+    assert.equal(returned.status, "200");
+    assert.deepEqual(returned.data, manifest);
   });
   it(`should abort`, async () => {
     const returned = await axios.post(url, {

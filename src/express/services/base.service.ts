@@ -32,8 +32,6 @@ export const base = async (req: any): Promise<any> => {
       return await readNoParams(req.body);
     case "manifest":
       return await manifest(req.body);
-    case "intermediateResults":
-      return await intermediateResults(req.body);
     case "finalResults":
       return await readNoParams(req.body);
     default:
@@ -139,15 +137,8 @@ const isTrustedHandler = async (body: any) => {
 };
 
 const manifest = async (body: any) => {
-  const { escrowId, url } = body;
-  const job = new JobReads(global.substrate, escrowId);
+  const { url } = body;
+  const job = new JobReads(global.substrate, 0);
 
   return await job.manifest(url);
-};
-
-const intermediateResults = async (body: any) => {
-  const { escrowId, index } = body;
-  const job = new JobReads(global.substrate, escrowId);
-
-  return await job.intermediateResults(index);
 };
