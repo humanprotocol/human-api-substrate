@@ -27,7 +27,7 @@ describe("express test", async () => {
     escrowId = returned.data.escrowId;
   });
 
-  it(`should launch escrow`, async () => {
+  it(`should launch escrow then cancel it`, async () => {
     const returned = await axios.post(url, {
       functionName: "launch",
       seed: "//Alice",
@@ -41,9 +41,33 @@ describe("express test", async () => {
 
     })
     assert.equal(escrow.data.status, "Pending")
+
+    const toSend = "2000000000000"
+    await axios.post(url, {
+  		functionName: "fundEscrow",
+  		escrowId: returned.data.escrowId,
+      seed: "//Alice",
+      amount: toSend,
+      escrowAddress: escrow.data.account
+
+    })
+
+    const returnedCancel = await axios.post(url, {
+      functionName: "cancel",
+  		escrowId: returned.data.escrowId,
+      seed: "//Alice",
+    });
+    assert.equal(returnedCancel.status, "200");
+    const escrowCanceled =  await axios.post(url, {
+      functionName: "escrow",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+
+    })
+    assert.equal(escrowCanceled.data.status, "Cancelled")
   });
 
-  it.only(`should create an escrow and bulk payout`, async () => {
+  it(`should create an escrow and bulk payout and complete`, async () => {
     const returned = await axios.post(url, {
       functionName: "createEscrow",
       seed: "//Alice",
@@ -135,25 +159,8 @@ describe("express test", async () => {
     assert.equal(returnedAfter.data, true)
     assert.equal(returned.status, "200");
   });
- 
-  it(`should cancel`, async () => {
-      const returned = await axios.post(url, {
-        functionName: "cancel",
-        escrowId,
-        seed: "//Alice",
-      });
-      assert.equal(returned.status, "200");
-      const escrow =  await axios.post(url, {
-        functionName: "escrow",
-        escrowId: returned.data.escrowId,
-        seed: "//Alice",
-  
-      })
-      assert.equal(escrow.data.status, "Cancelled")
-   
-  });
 
-  it.skip(`should store final results`, async () => {
+  it(`should store final results`, async () => {
     const finalResults = { results: "final" };
     const returned = await axios.post(url, {
       functionName: "storeFinalResults",
@@ -169,22 +176,38 @@ describe("express test", async () => {
       results: finalResults
     });
 
-    assert.equal(returnedfinalResults.data, finalResults)
+    assert.deepEqual(returnedfinalResults.data, finalResults)
 
 });
 it(`should abort`, async () => {
   const returned = await axios.post(url, {
-    functionName: "abort",
-    escrowId,
+    functionName: "createEscrow",
     seed: "//Alice",
+    manifestUrl,
+    manifestHash,
+    reputationOracle,
+    recordingOracle,
+    reputationOracleStake,
+    recordingOracleStake,
   });
-  assert.equal(returned.status, "200");
-  const escrow =  await axios.post(url, {
-    functionName: "escrow",
+
+  const returnedAbort = await axios.post(url, {
+    functionName: "abort",
     escrowId: returned.data.escrowId,
     seed: "//Alice",
+  });
 
-  })
-  assert.equal(escrow.data.status, "Aborted")
+  assert.equal(returnedAbort.status, "200");
+  try {
+    await axios.post(url, {
+      functionName: "escrow",
+      escrowId: returned.data.escrowId,
+      seed: "//Alice",
+  
+    })
+
+  } catch (e) {
+    assert.equal(e.response.data, "Option: unwrapping a None value")
+  }
 });
 });
