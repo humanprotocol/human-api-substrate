@@ -220,18 +220,18 @@ describe("express test", async () => {
     }
   });
   it(`should fail if null input`, async () => {
-  try {
-    const returned = await axios.post(url, {
-      functionName: "createEscrow",
-      seed: "//Alice",
-      manifestUrl,
-      manifestHash,
-      reputationOracle,
-      recordingOracle,
-      reputationOracleStake,
-    });
-  } catch (e) {
-    assert.equal(e.response.data, "Invalid Input");
-  }
-  })
+    try {
+      const returned = await axios.post(url, {
+        functionName: "createEscrow",
+        seed: "//Alice",
+        manifestUrl,
+        manifestHash,
+        reputationOracle,
+        recordingOracle,
+        reputationOracleStake,
+      });
+    } catch (e) {
+      assert.equal(e.response.data, "Invalid Input");
+    }
+  });
 });
