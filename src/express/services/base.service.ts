@@ -40,6 +40,7 @@ export const base = async (req: any): Promise<any> => {
 };
 
 const launch = async (body: any): Promise<any> => {
+  validate(body, 3)
   const { manifest, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = await Job.launch(global.substrate, sender, manifest);
@@ -47,7 +48,9 @@ const launch = async (body: any): Promise<any> => {
   return { escrowId: job.escrowId };
 };
 
+
 const createEscrow = async (body: any): Promise<any> => {
+  validate(body, 8)
   const {
     manifestHash,
     manifestUrl,
@@ -73,6 +76,7 @@ const createEscrow = async (body: any): Promise<any> => {
 };
 
 const addTrustedHandlers = async (body: any) => {
+  validate(body, 4)
   const { escrowId, handlers, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -81,6 +85,7 @@ const addTrustedHandlers = async (body: any) => {
 };
 
 const fundEscrow = async (body: any) => {
+  validate(body, 5)
   const { amount, escrowAddress, escrowId, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -89,6 +94,7 @@ const fundEscrow = async (body: any) => {
 };
 
 const bulkPayout = async (body: any) => {
+  validate(body, 4)
   const { escrowId, payouts, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -97,6 +103,7 @@ const bulkPayout = async (body: any) => {
 };
 
 const storeFinalResults = async (body: any) => {
+  validate(body, 4)
   const { escrowId, results, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -105,6 +112,7 @@ const storeFinalResults = async (body: any) => {
 };
 
 const writeNoParams = async (body: any) => {
+  validate(body, 3)
   const { escrowId, functionName, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -114,6 +122,7 @@ const writeNoParams = async (body: any) => {
 };
 
 const noteIntermediateResults = async (body: any) => {
+  validate(body, 4)
   const { escrowId, results, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -122,6 +131,7 @@ const noteIntermediateResults = async (body: any) => {
 };
 
 const readNoParams = async (body: any) => {
+  validate(body, 2)
   const { escrowId, functionName } = body;
   const job = new JobReads(global.substrate, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
@@ -130,6 +140,7 @@ const readNoParams = async (body: any) => {
 };
 
 const isTrustedHandler = async (body: any) => {
+  validate(body, 3)
   const { address, escrowId } = body;
   const job = new JobReads(global.substrate, escrowId);
 
@@ -137,8 +148,16 @@ const isTrustedHandler = async (body: any) => {
 };
 
 const manifest = async (body: any) => {
+  validate(body, 2)
   const { url } = body;
   const job = new JobReads(global.substrate, 0);
 
   return await job.manifest(url);
 };
+
+const validate = (body: any, args: number) => {
+  const values = Object.values(body)
+  if(values.length < args) {
+    throw new Error("Invalid Input")
+  }
+}
