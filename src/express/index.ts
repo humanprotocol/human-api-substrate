@@ -4,6 +4,7 @@ import express from "express";
 import logger from "morgan";
 
 import { setup } from "../index.js";
+import { endpoint } from "./config/config";
 import routes from "./routes";
 
 const port = "3001";
@@ -35,7 +36,7 @@ declare global {
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port}!`);
-  const returned: any = await setup();
+  const returned: any = await setup(endpoint);
 
   global.substrate = returned.api;
   global.keyring = returned.keyring;
