@@ -41,5 +41,6 @@ module.exports = {
     "object-curly-newline": "off",
     "space-before-function-paren": "off",
     "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
   },
 };
