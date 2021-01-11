@@ -116,7 +116,7 @@ const writeNoParams = async (body: any) => {
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
-
+  // @ts-ignore
   await job[`${functionCall}`]();
 };
 
@@ -134,7 +134,7 @@ const readNoParams = async (body: any) => {
   const { escrowId, functionName } = body;
   const job = new JobReads(global.substrate, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
-
+  // @ts-ignore
   return await job[`${functionCall}`]();
 };
 
