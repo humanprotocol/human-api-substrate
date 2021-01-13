@@ -1,3 +1,5 @@
+import * as yup from "yup";
+
 import { EscrowId, Job, JobReads, setup } from "../../index";
 
 export const base = async (req: any): Promise<any> => {
@@ -39,8 +41,13 @@ export const base = async (req: any): Promise<any> => {
   }
 };
 
+const launchSchema = yup.object().shape({
+  manifest: yup.object().required(),
+  seed: yup.string().required(),
+});
+
 const launch = async (body: any): Promise<any> => {
-  validate(body, 3);
+  await launchSchema.validate(body);
   const { manifest, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = await Job.launch(global.substrate, sender, manifest);
@@ -48,8 +55,18 @@ const launch = async (body: any): Promise<any> => {
   return { escrowId: job.escrowId };
 };
 
+const createEscrowSchema = yup.object().shape({
+  manifestHash: yup.string().required(),
+  manifestUrl: yup.string().required(),
+  recordingOracle: yup.string().required(),
+  recordingOracleStake: yup.string().required(),
+  reputationOracle: yup.string().required(),
+  reputationOracleStake: yup.string().required(),
+  seed: yup.string().required(),
+});
+
 const createEscrow = async (body: any): Promise<any> => {
-  validate(body, 8);
+  await createEscrowSchema.validate(body);
   const {
     manifestHash,
     manifestUrl,
@@ -74,8 +91,14 @@ const createEscrow = async (body: any): Promise<any> => {
   return { escrowId: job.escrowId };
 };
 
+const addTrustedHandlersSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  handlers: yup.array().required(),
+  seed: yup.string().required(),
+});
+
 const addTrustedHandlers = async (body: any) => {
-  validate(body, 4);
+  await addTrustedHandlersSchema.validate(body);
   const { escrowId, handlers, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -83,8 +106,15 @@ const addTrustedHandlers = async (body: any) => {
   await job.addTrustedHandlers(handlers);
 };
 
+const fundEscrowSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  escrowAddress: yup.string().required(),
+  seed: yup.string().required(),
+  amount: yup.string().required(),
+});
+
 const fundEscrow = async (body: any) => {
-  validate(body, 5);
+  await fundEscrowSchema.validate(body);
   const { amount, escrowAddress, escrowId, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -92,8 +122,14 @@ const fundEscrow = async (body: any) => {
   await job.fundEscrow(escrowAddress, amount);
 };
 
+const bulkPayoutSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  payouts: yup.object().required(),
+  seed: yup.string().required(),
+});
+
 const bulkPayout = async (body: any) => {
-  validate(body, 4);
+  await bulkPayoutSchema.validate(body);
   const { escrowId, payouts, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -101,8 +137,14 @@ const bulkPayout = async (body: any) => {
   await job.bulkPayout(payouts);
 };
 
+const storeFinalResultsSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  results: yup.object().required(),
+  seed: yup.string().required(),
+});
+
 const storeFinalResults = async (body: any) => {
-  validate(body, 4);
+  await storeFinalResultsSchema.validate(body);
   const { escrowId, results, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -110,8 +152,14 @@ const storeFinalResults = async (body: any) => {
   await job.storeFinalResults(results);
 };
 
+const writeNoParamsSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  functionName: yup.string().required(),
+  seed: yup.string().required(),
+});
+
 const writeNoParams = async (body: any) => {
-  validate(body, 3);
+  await writeNoParamsSchema.validate(body);
   const { escrowId, functionName, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -121,8 +169,14 @@ const writeNoParams = async (body: any) => {
   await job[`${functionCall}`]();
 };
 
+const noteIntermediateResultsSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  results: yup.object().required(),
+  seed: yup.string().required(),
+});
+
 const noteIntermediateResults = async (body: any) => {
-  validate(body, 4);
+  await noteIntermediateResultsSchema.validate(body);
   const { escrowId, results, seed } = body;
   const sender = global.keyring.addFromUri(seed);
   const job = new Job(global.substrate, sender, escrowId);
@@ -130,8 +184,13 @@ const noteIntermediateResults = async (body: any) => {
   await job.noteIntermediateResults(results);
 };
 
+const readNoParamsSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  functionName: yup.string().required(),
+});
+
 const readNoParams = async (body: any) => {
-  validate(body, 2);
+  await readNoParamsSchema.validate(body);
   const { escrowId, functionName } = body;
   const job = new JobReads(global.substrate, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
@@ -140,26 +199,27 @@ const readNoParams = async (body: any) => {
   return await job[`${functionCall}`]();
 };
 
+const isTrustedHandlerSchema = yup.object().shape({
+  escrowId: yup.string().required(),
+  address: yup.string().required(),
+});
+
 const isTrustedHandler = async (body: any) => {
-  validate(body, 3);
+  await isTrustedHandlerSchema.validate(body);
   const { address, escrowId } = body;
   const job = new JobReads(global.substrate, escrowId);
 
   return await job.isTrustedHandler(address);
 };
 
+const manifestSchema = yup.object().shape({
+  url: yup.string().required(),
+});
+
 const manifest = async (body: any) => {
-  validate(body, 2);
+  await manifestSchema.validate(body);
   const { url } = body;
   const job = new JobReads(global.substrate, 0);
 
   return await job.manifest(url);
-};
-
-const validate = (body: any, args: number) => {
-  const values = Object.values(body);
-
-  if (values.length < args) {
-    throw new Error("Invalid Input");
-  }
 };

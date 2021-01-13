@@ -231,7 +231,7 @@ describe("express test", async () => {
         reputationOracleStake,
       });
     } catch (e) {
-      assert.equal(e.response.data, "Invalid Input");
+      assert.equal(e.response.data, "recordingOracleStake is a required field");
     }
   });
 });
