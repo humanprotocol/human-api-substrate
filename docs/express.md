@@ -10,7 +10,7 @@
 
 ### Config
 
-- in express/config/config.ts you can add a custom ws enpoint/ default is local host
+- in express/config/config.ts you can add a custom ws endpoint/ default is local host
 
 ### Usage
 
