@@ -199,10 +199,7 @@ export default class Job extends JobReads {
       this.escrowId
     );
 
-    await sendAndWaitFor(this.api, call, this.sender, {
-      section: "balances",
-      name: "Transfer",
-    }).catch((e) => {
+    await sendAndWait(this.api, call, this.sender).catch((e) => {
       throw new Error(e.message);
     });
   }
