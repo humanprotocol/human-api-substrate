@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-import { EscrowId, Job, JobReads, setup } from "../../index";
+import { Job, JobReads } from "../../index";
 
 export const base = async (req: any): Promise<any> => {
   const { functionName } = req.body;
