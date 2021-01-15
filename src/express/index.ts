@@ -35,7 +35,7 @@ declare global {
 }
 
 app.listen(port, async () => {
-  console.log(`Example app listening on port ${port}!`);
+  console.log(`Api listening on port ${port}!`);
   const returned: any = await setup(endpoint);
 
   global.substrate = returned.api;
