@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import logger from "morgan";
 
-import { setup } from "../index.js";
+import { setup } from "../index";
 import { endpoint } from "./config/config";
 import routes from "./routes";
 
