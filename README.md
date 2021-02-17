@@ -6,3 +6,4 @@
 
 - [high level explainer](docs/highLevel.md)
 - [integration guide](docs/integration.md)
+- [express wrapper guide](docs/express.md)

@@ -6,7 +6,7 @@
 
 - make sure to have a chain running at port 9944 (docker-compose up will start a chain for you if not running)
 - `yarn`
-- `yarn start` (use yarn compile then yarn express for dev mode)
+- `yarn start` (use yarn express for dev mode)
 
 ### Config
 
