@@ -7,7 +7,10 @@ const router = Router();
 
 router.post("/", jobsController.create);
 
-router.post("/storeIntermediateResults", jobsController.storeIntermediateResults);
+router.post(
+  "/storeIntermediateResults",
+  jobsController.storeIntermediateResults
+);
 
 router.post("/bulkPayout", jobsController.bulkPayout);
 

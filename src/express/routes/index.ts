@@ -5,5 +5,5 @@ import manifest from "./manifest";
 export default {
   factory,
   jobs,
-  manifest
+  manifest,
 };

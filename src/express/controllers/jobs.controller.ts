@@ -60,8 +60,6 @@ export const status = async (req: any, res: any) => {
     req.body.functionName = constants.ESCROW;
     const data = await baseService.base(req);
 
-    console.log(u8aToString(data.manifest_url));
-
     return res.status(200).send({ status: data.status });
   } catch (e) {
     console.log(e.message);

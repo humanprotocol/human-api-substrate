@@ -11,7 +11,7 @@ export const create = (req: any, res: any) => {
 export const get = (req: any, res: any) => {
   try {
     // TODO: Get all jobs.
-    return res.status(200).send({ });
+    return res.status(200).send({});
   } catch (e) {
     console.log(e.message);
 
