@@ -1,8 +1,6 @@
-import * as baseService from "../services/base.service";
-
-export const create = async (req: any, res: any) => {
+export const create = (req: any, res: any) => {
   try {
-    return res.status(200).send({ data: "0"});
+    return res.status(200).send({ data: "0" });
   } catch (e) {
     console.log(e.message);
 
@@ -10,10 +8,10 @@ export const create = async (req: any, res: any) => {
   }
 };
 
-export const get = async (req: any, res: any) => {
+export const get = (req: any, res: any) => {
   try {
     // TODO: Get all jobs.
-    return res.status(200).send({});
+    return res.status(200).send({ });
   } catch (e) {
     console.log(e.message);
 

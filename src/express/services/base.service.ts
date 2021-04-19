@@ -5,6 +5,7 @@ import * as constants from "../config/constants";
 
 export const base = async (req: any): Promise<any> => {
   const { functionName } = req.body;
+
   switch (functionName) {
     case constants.LAUNCH:
       return await launch(req.body);
@@ -165,6 +166,7 @@ const writeNoParams = async (body: any) => {
   const job = new Job(global.substrate, sender, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   await job[`${functionCall}`]();
 };
@@ -195,6 +197,7 @@ const readNoParams = async (body: any) => {
   const job = new JobReads(global.substrate, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return await job[`${functionCall}`]();
 };

@@ -1,6 +1,7 @@
-import * as baseService from "../services/base.service";
-import * as constants from "../config/constants";
 import { u8aToString } from "@polkadot/util";
+
+import * as constants from "../config/constants";
+import * as baseService from "../services/base.service";
 
 export const create = async (req: any, res: any) => {
   try {
@@ -58,7 +59,9 @@ export const status = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ESCROW;
     const data = await baseService.base(req);
+
     console.log(u8aToString(data.manifest_url));
+
     return res.status(200).send({ status: data.status });
   } catch (e) {
     console.log(e.message);
@@ -71,6 +74,7 @@ export const manifestUrl = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ESCROW;
     const data = await baseService.base(req);
+
     return res.status(200).send({ data: u8aToString(data.manifest_url) });
   } catch (e) {
     console.log(e.message);
@@ -83,6 +87,7 @@ export const manifestHash = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ESCROW;
     const data = await baseService.base(req);
+
     return res.status(200).send({ data: data.manifest_hash });
   } catch (e) {
     console.log(e.message);
@@ -95,6 +100,7 @@ export const balance = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.BALANCE;
     const data = await baseService.base(req);
+
     return res.status(200).send({ data: parseInt(data) });
   } catch (e) {
     console.log(e.message);
@@ -107,7 +113,9 @@ export const abort = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ABORT;
     const data = await baseService.base(req);
+
     console.log(JSON.stringify(data));
+
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
@@ -121,7 +129,9 @@ export const cancel = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.CANCEL;
     const data = await baseService.base(req);
+
     console.log(JSON.stringify(data));
+
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
@@ -135,7 +145,9 @@ export const complete = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.COMPLETE;
     const data = await baseService.base(req);
+
     console.log(JSON.stringify(data));
+
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
@@ -149,7 +161,9 @@ export const finalResults = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.FINAL_RESULTS;
     const data = await baseService.base(req);
+
     console.log(JSON.stringify(data));
+
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
@@ -163,7 +177,9 @@ export const intermediateResults = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.FINAL_RESULTS;
     const data = await baseService.base(req);
+
     console.log(JSON.stringify(data));
+
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
@@ -177,6 +193,7 @@ export const launcher = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ESCROW;
     const data = await baseService.base(req);
+
     return res.status(200).send({ data: data.canceller });
   } catch (e) {
     console.log(e.message);

@@ -36,6 +36,7 @@ declare global {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.listen(port, async () => {
   console.log(`API listening on port ${port}!`);
   const returned: any = await setup(endpoint);
