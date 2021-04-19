@@ -1,43 +1,43 @@
 import * as yup from "yup";
 
 import { Job, JobReads } from "../../index";
+import * as constants from "../config/constants";
 
 export const base = async (req: any): Promise<any> => {
   const { functionName } = req.body;
-
   switch (functionName) {
-    case "launch":
+    case constants.LAUNCH:
       return await launch(req.body);
-    case "createEscrow":
+    case constants.CREATE_ESCROW:
       return await createEscrow(req.body);
-    case "fundEscrow":
+    case constants.FUND_ESCROW:
       return await fundEscrow(req.body);
-    case "addTrustedHandlers":
+    case constants.ADD_TRUSTED_HANDLERS:
       return await addTrustedHandlers(req.body);
-    case "bulkPayout":
+    case constants.BULK_PAYOUT:
       return await bulkPayout(req.body);
-    case "storeFinalResults":
+    case constants.STORE_FINAL_RESULTS:
       return await storeFinalResults(req.body);
-    case "abort":
+    case constants.ABORT:
       return await writeNoParams(req.body);
-    case "cancel":
+    case constants.CANCEL:
       return await writeNoParams(req.body);
-    case "noteIntermediateResults":
+    case constants.NOTE_INTERMEDIATE_RESULTS:
       return await noteIntermediateResults(req.body);
-    case "complete":
+    case constants.COMPLETE:
       return await writeNoParams(req.body);
-    case "escrow":
+    case constants.ESCROW:
       return await readNoParams(req.body);
-    case "isTrustedHandler":
+    case constants.IS_TRUSTED_HANDLER:
       return await isTrustedHandler(req.body);
-    case "balance":
+    case constants.BALANCE:
       return await readNoParams(req.body);
-    case "manifest":
+    case constants.MANIFEST:
       return await manifest(req.body);
-    case "finalResults":
+    case constants.FINAL_RESULTS:
       return await readNoParams(req.body);
     default:
-      throw new Error("invalid function name");
+      throw new Error("Invalid function name.");
   }
 };
 
@@ -213,13 +213,13 @@ const isTrustedHandler = async (body: any) => {
 };
 
 const manifestSchema = yup.object().shape({
-  url: yup.string().required(),
+  manifestUrl: yup.string().required(),
 });
 
 const manifest = async (body: any) => {
   await manifestSchema.validate(body);
-  const { url } = body;
+  const { manifestUrl } = body;
   const job = new JobReads(global.substrate, 0);
 
-  return await job.manifest(url);
+  return await job.manifest(manifestUrl);
 };

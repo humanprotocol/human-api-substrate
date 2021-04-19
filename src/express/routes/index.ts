@@ -1,5 +1,9 @@
-import base from "./base";
+import factory from "./factory";
+import jobs from "./jobs";
+import manifest from "./manifest";
 
 export default {
-  base,
+  factory,
+  jobs,
+  manifest
 };
