@@ -45,7 +45,7 @@ export const base = async (req: any): Promise<any> => {
 };
 
 const launchSchema = yup.object().shape({
-  manifest: yup.object().required()
+  manifest: yup.object().required(),
 });
 
 const launch = async (body: any): Promise<any> => {
@@ -62,7 +62,7 @@ const createEscrowSchema = yup.object().shape({
   recordingOracle: yup.string().required(),
   recordingOracleStake: yup.string().required(),
   reputationOracle: yup.string().required(),
-  reputationOracleStake: yup.string().required()
+  reputationOracleStake: yup.string().required(),
 });
 
 const createEscrow = async (body: any): Promise<any> => {
@@ -73,7 +73,7 @@ const createEscrow = async (body: any): Promise<any> => {
     recordingOracle,
     recordingOracleStake,
     reputationOracle,
-    reputationOracleStake
+    reputationOracleStake,
   } = body;
   const job = await Job.createEscrow(
     global.substrate,
@@ -91,7 +91,7 @@ const createEscrow = async (body: any): Promise<any> => {
 
 const addTrustedHandlersSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  handlers: yup.array().required()
+  handlers: yup.array().required(),
 });
 
 const addTrustedHandlers = async (body: any) => {
@@ -118,7 +118,7 @@ const fundEscrow = async (body: any) => {
 
 const bulkPayoutSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  payouts: yup.object().required()
+  payouts: yup.object().required(),
 });
 
 const bulkPayout = async (body: any) => {
@@ -131,7 +131,7 @@ const bulkPayout = async (body: any) => {
 
 const storeFinalResultsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  results: yup.object().required()
+  results: yup.object().required(),
 });
 
 const storeFinalResults = async (body: any) => {
@@ -144,7 +144,7 @@ const storeFinalResults = async (body: any) => {
 
 const writeNoParamsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  functionName: yup.string().required()
+  functionName: yup.string().required(),
 });
 
 const writeNoParams = async (body: any) => {
@@ -160,7 +160,7 @@ const writeNoParams = async (body: any) => {
 
 const noteIntermediateResultsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  results: yup.object().required()
+  results: yup.object().required(),
 });
 
 const noteIntermediateResults = async (body: any) => {
