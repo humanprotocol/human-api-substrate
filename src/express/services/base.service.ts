@@ -37,21 +37,21 @@ export const base = async (req: any): Promise<any> => {
       return await manifest(req.body);
     case constants.FINAL_RESULTS:
       return await readNoParams(req.body);
+    case constants.ALL_JOBS:
+      return await getAllJobs();
     default:
       throw new Error("Invalid function name.");
   }
 };
 
 const launchSchema = yup.object().shape({
-  manifest: yup.object().required(),
-  seed: yup.string().required(),
+  manifest: yup.object().required()
 });
 
 const launch = async (body: any): Promise<any> => {
   await launchSchema.validate(body);
-  const { manifest, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = await Job.launch(global.substrate, sender, manifest);
+  const { manifest } = body;
+  const job = await Job.launch(global.substrate, body.sender, manifest);
 
   return { escrowId: job.escrowId };
 };
@@ -62,8 +62,7 @@ const createEscrowSchema = yup.object().shape({
   recordingOracle: yup.string().required(),
   recordingOracleStake: yup.string().required(),
   reputationOracle: yup.string().required(),
-  reputationOracleStake: yup.string().required(),
-  seed: yup.string().required(),
+  reputationOracleStake: yup.string().required()
 });
 
 const createEscrow = async (body: any): Promise<any> => {
@@ -74,13 +73,11 @@ const createEscrow = async (body: any): Promise<any> => {
     recordingOracle,
     recordingOracleStake,
     reputationOracle,
-    reputationOracleStake,
-    seed,
+    reputationOracleStake
   } = body;
-  const sender = global.keyring.addFromUri(seed);
   const job = await Job.createEscrow(
     global.substrate,
-    sender,
+    body.sender,
     manifestUrl,
     manifestHash,
     reputationOracle,
@@ -94,15 +91,13 @@ const createEscrow = async (body: any): Promise<any> => {
 
 const addTrustedHandlersSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  handlers: yup.array().required(),
-  seed: yup.string().required(),
+  handlers: yup.array().required()
 });
 
 const addTrustedHandlers = async (body: any) => {
   await addTrustedHandlersSchema.validate(body);
-  const { escrowId, handlers, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { escrowId, handlers } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
 
   await job.addTrustedHandlers(handlers);
 };
@@ -110,60 +105,52 @@ const addTrustedHandlers = async (body: any) => {
 const fundEscrowSchema = yup.object().shape({
   escrowId: yup.string().required(),
   escrowAddress: yup.string().required(),
-  seed: yup.string().required(),
   amount: yup.string().required(),
 });
 
 const fundEscrow = async (body: any) => {
   await fundEscrowSchema.validate(body);
-  const { amount, escrowAddress, escrowId, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { amount, escrowAddress, escrowId } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
 
   await job.fundEscrow(escrowAddress, amount);
 };
 
 const bulkPayoutSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  payouts: yup.object().required(),
-  seed: yup.string().required(),
+  payouts: yup.object().required()
 });
 
 const bulkPayout = async (body: any) => {
   await bulkPayoutSchema.validate(body);
-  const { escrowId, payouts, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { escrowId, payouts } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
 
   await job.bulkPayout(payouts);
 };
 
 const storeFinalResultsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  results: yup.object().required(),
-  seed: yup.string().required(),
+  results: yup.object().required()
 });
 
 const storeFinalResults = async (body: any) => {
   await storeFinalResultsSchema.validate(body);
-  const { escrowId, results, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { escrowId, results } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
 
   await job.storeFinalResults(results);
 };
 
 const writeNoParamsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  functionName: yup.string().required(),
-  seed: yup.string().required(),
+  functionName: yup.string().required()
 });
 
 const writeNoParams = async (body: any) => {
   await writeNoParamsSchema.validate(body);
-  const { escrowId, functionName, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { escrowId, functionName } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
   const functionCall = [functionName] as (keyof typeof job)[];
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -173,15 +160,13 @@ const writeNoParams = async (body: any) => {
 
 const noteIntermediateResultsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  results: yup.object().required(),
-  seed: yup.string().required(),
+  results: yup.object().required()
 });
 
 const noteIntermediateResults = async (body: any) => {
   await noteIntermediateResultsSchema.validate(body);
-  const { escrowId, results, seed } = body;
-  const sender = global.keyring.addFromUri(seed);
-  const job = new Job(global.substrate, sender, escrowId);
+  const { escrowId, results } = body;
+  const job = new Job(global.substrate, body.sender, escrowId);
 
   await job.noteIntermediateResults(results);
 };
@@ -225,4 +210,10 @@ const manifest = async (body: any) => {
   const job = new JobReads(global.substrate, 0);
 
   return await job.manifest(manifestUrl);
+};
+
+const getAllJobs = async () => {
+  const job = new JobReads(global.substrate, 0);
+
+  return await job.getAllJobs();
 };

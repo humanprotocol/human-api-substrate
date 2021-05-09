@@ -2,6 +2,7 @@
 /* eslint-disable */
 
 import type { Vec, u32 } from '@polkadot/types';
+import type { Codec } from '@polkadot/types/types';
 import type { Balance, BalanceOf, BlockNumber, Moment, RuntimeDbWeight, Weight } from '@polkadot/types/interfaces/runtime';
 import type { WeightToFeeCoefficient } from '@polkadot/types/interfaces/support';
 import type { ApiTypes } from '@polkadot/api/types';
@@ -9,12 +10,14 @@ import type { ApiTypes } from '@polkadot/api/types';
 declare module '@polkadot/api/types/consts' {
   export interface AugmentedConsts<ApiType> {
     balances: {
+      [key: string]: Codec;
       /**
        * The minimum amount required to keep an account open.
        **/
       existentialDeposit: Balance & AugmentedConst<ApiType>;
     };
     system: {
+      [key: string]: Codec;
       /**
        * The base weight of executing a block, independent of the transactions in the block.
        **/
@@ -41,6 +44,7 @@ declare module '@polkadot/api/types/consts' {
       maximumBlockWeight: Weight & AugmentedConst<ApiType>;
     };
     timestamp: {
+      [key: string]: Codec;
       /**
        * The minimum period between blocks. Beware that this is different to the *expected* period
        * that the block production apparatus provides. Your chosen consensus system will generally
@@ -50,6 +54,7 @@ declare module '@polkadot/api/types/consts' {
       minimumPeriod: Moment & AugmentedConst<ApiType>;
     };
     transactionPayment: {
+      [key: string]: Codec;
       /**
        * The fee to be paid for making a transaction; the per-byte portion.
        **/
@@ -62,5 +67,6 @@ declare module '@polkadot/api/types/consts' {
   }
 
   export interface QueryableConsts<ApiType extends ApiTypes> extends AugmentedConsts<ApiType> {
+    [key: string]: QueryableModuleConsts;
   }
 }

@@ -3,7 +3,6 @@
 
 import type { Bytes, Compact, Option, Vec, u32, u64 } from '@polkadot/types';
 import type { AnyNumber } from '@polkadot/types/types';
-import type { EscrowId } from './escrow';
 import type { Extrinsic } from '@polkadot/types/interfaces/extrinsics';
 import type { GrandpaEquivocationProof, KeyOwnerProof } from '@polkadot/types/interfaces/grandpa';
 import type { AccountId, AccountIndex, Address, Balance, BalanceOf, BlockNumber, Call, ChangesTrieConfiguration, KeyValue, LookupSource, Moment, Perbill, Percent, Weight } from '@polkadot/types/interfaces/runtime';
@@ -13,6 +12,7 @@ import type { ApiTypes, SubmittableExtrinsic } from '@polkadot/api/types';
 declare module '@polkadot/api/types/submittable' {
   export interface AugmentedSubmittables<ApiType> {
     balances: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Exactly as `transfer`, except the origin must be root and the source account may be
        * specified.
@@ -89,40 +89,41 @@ declare module '@polkadot/api/types/submittable' {
       transferKeepAlive: AugmentedSubmittable<(dest: LookupSource | Address | AccountId | AccountIndex | string | Uint8Array, value: Compact<Balance> | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
     };
     escrow: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Abort the escrow at `id` and refund any balance to the canceller defined in the escrow.
        * 
        * Clears escrow state.
        * Requires trusted handler privileges.
        **/
-      abort: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      abort: AugmentedSubmittable<(id: EscrowId | null) => SubmittableExtrinsic<ApiType>>;
       /**
        * Add the given accounts as trusted for escrow with `id`.
        * 
        * Allows these accounts to execute privileged operations.
        * Requires trusted handler privileges.
        **/
-      addTrustedHandlers: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array, handlers: Vec<AccountId> | (AccountId | string | Uint8Array)[]) => SubmittableExtrinsic<ApiType>>;
+      addTrustedHandlers: AugmentedSubmittable<(id: EscrowId | null, handlers: Vec<AccountId> | (AccountId | string | Uint8Array)[]) => SubmittableExtrinsic<ApiType>>;
       /**
        * Pay out `recipients` with `amounts`. Calculates and transfer oracle fees.
        * 
-       * Sets the escrow to `Complete` if all balance is spent, otherwise to `Partial`.
+       * Sets the escrow to `Paid` if all balance is spent, otherwise to `Partial`.
        * Requires trusted handler privileges.
        **/
-      bulkPayout: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array, recipients: Vec<AccountId> | (AccountId | string | Uint8Array)[], amounts: Vec<BalanceOf> | (BalanceOf | AnyNumber | Uint8Array)[]) => SubmittableExtrinsic<ApiType>>;
+      bulkPayout: AugmentedSubmittable<(id: EscrowId | null, recipients: Vec<AccountId> | (AccountId | string | Uint8Array)[], amounts: Vec<BalanceOf> | (BalanceOf | AnyNumber | Uint8Array)[]) => SubmittableExtrinsic<ApiType>>;
       /**
        * Cancel the escrow at `id` and refund any balance to the canceller defined in the escrow.
        * 
        * Requires trusted handler privileges.
        **/
-      cancel: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      cancel: AugmentedSubmittable<(id: EscrowId | null) => SubmittableExtrinsic<ApiType>>;
       /**
        * Set the escrow at `id` to be complete.
        * 
        * Prohibits further editing or payouts of the escrow.
        * Requires trusted handler privileges.
        **/
-      complete: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      complete: AugmentedSubmittable<(id: EscrowId | null) => SubmittableExtrinsic<ApiType>>;
       /**
        * Create a new escrow with the given manifest and oracles.
        * 
@@ -136,15 +137,16 @@ declare module '@polkadot/api/types/submittable' {
        * 
        * Requires trusted handler privileges.
        **/
-      noteIntermediateResults: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array, url: Bytes | string | Uint8Array, hash: Bytes | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      noteIntermediateResults: AugmentedSubmittable<(id: EscrowId | null, url: Bytes | string | Uint8Array, hash: Bytes | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
       /**
        * Store the url and hash of the final results in storage.
        * 
        * Requires trusted handler privileges.
        **/
-      storeFinalResults: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array, url: Bytes | string | Uint8Array, hash: Bytes | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      storeFinalResults: AugmentedSubmittable<(id: EscrowId | null, url: Bytes | string | Uint8Array, hash: Bytes | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
     };
     grandpa: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Note that the current authority set of the GRANDPA finality gadget has
        * stalled. This will trigger a forced authority set change at the beginning
@@ -176,12 +178,14 @@ declare module '@polkadot/api/types/submittable' {
       reportEquivocationUnsigned: AugmentedSubmittable<(equivocationProof: GrandpaEquivocationProof | { setId?: any; equivocation?: any } | string | Uint8Array, keyOwnerProof: KeyOwnerProof | { session?: any; trieNodes?: any; validatorCount?: any } | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
     };
     kvStore: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Set the `value` under the sender's account id and `key`.
        **/
       set: AugmentedSubmittable<(key: Bytes | string | Uint8Array, value: Bytes | string | Uint8Array) => SubmittableExtrinsic<ApiType>>;
     };
     sudo: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Authenticates the current sudo key and sets the given AccountId (`new`) as the new sudo key.
        * 
@@ -236,6 +240,7 @@ declare module '@polkadot/api/types/submittable' {
       sudoUncheckedWeight: AugmentedSubmittable<(call: Call | { callIndex?: any; args?: any } | string | Uint8Array, weight: Weight | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
     };
     system: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * A dispatch that will fill the block weight up to the given ratio.
        **/
@@ -349,6 +354,7 @@ declare module '@polkadot/api/types/submittable' {
       suicide: AugmentedSubmittable<() => SubmittableExtrinsic<ApiType>>;
     };
     timestamp: {
+      [key: string]: SubmittableExtrinsicFunction<ApiType>;
       /**
        * Set the current time.
        * 
@@ -372,5 +378,6 @@ declare module '@polkadot/api/types/submittable' {
 
   export interface SubmittableExtrinsics<ApiType extends ApiTypes> extends AugmentedSubmittables<ApiType> {
     (extrinsic: Call | Extrinsic | Uint8Array | string): SubmittableExtrinsic<ApiType>;
+    [key: string]: SubmittableModuleExtrinsics<ApiType>;
   }
 }

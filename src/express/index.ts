@@ -5,6 +5,7 @@ import logger from "morgan";
 
 import { setup } from "../index";
 import { endpoint } from "./config/constants";
+import keysMiddleware from "./middleware/keysMiddleware";
 import routes from "./routes";
 
 const port = "3001";
@@ -21,6 +22,8 @@ app.use(json({ limit: "5mb" }));
 app.use((req: any, res: any, next: any) => {
   next();
 });
+
+app.use(keysMiddleware);
 
 app.use("/factory", routes.factory);
 app.use("/manifest", routes.manifest);

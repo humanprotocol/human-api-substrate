@@ -106,4 +106,14 @@ export default class JobReads {
 
     return download(url, privKey);
   }
+
+  /**
+   *
+   * @returns all active jobs
+   */
+  public async getAllJobs(): Promise<any> {
+    const jobs = await this.api.query.escrow.escrowList();
+
+    return jobs;
+  }
 }

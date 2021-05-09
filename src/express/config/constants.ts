@@ -18,3 +18,4 @@ export const BALANCE = "balance";
 export const MANIFEST = "manifest";
 export const FINAL_RESULTS = "finalResults";
 export const STATUS = "escrow";
+export const ALL_JOBS = "getAllJobs";
