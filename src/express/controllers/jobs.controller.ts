@@ -1,6 +1,7 @@
 import { u8aToString } from "@polkadot/util";
 
 import * as constants from "../config/constants";
+import { APIError, handleError } from "../middleware/errorHandler";
 import * as baseService from "../services/base.service";
 
 export const create = async (req: any, res: any) => {
@@ -10,9 +11,9 @@ export const create = async (req: any, res: any) => {
 
     return res.status(200).send(data);
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -23,9 +24,9 @@ export const storeIntermediateResults = async (req: any, res: any) => {
 
     return res.status(200).send(data);
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -36,9 +37,9 @@ export const bulkPayout = async (req: any, res: any) => {
 
     return res.status(200).send(data);
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -49,9 +50,9 @@ export const addTrustedHandlers = async (req: any, res: any) => {
 
     return res.status(200).send(data);
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -62,9 +63,9 @@ export const status = async (req: any, res: any) => {
 
     return res.status(200).send({ status: data.status });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -75,9 +76,9 @@ export const manifestUrl = async (req: any, res: any) => {
 
     return res.status(200).send({ data: u8aToString(data.manifest_url) });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -88,9 +89,9 @@ export const manifestHash = async (req: any, res: any) => {
 
     return res.status(200).send({ data: data.manifest_hash });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -101,57 +102,48 @@ export const balance = async (req: any, res: any) => {
 
     return res.status(200).send({ data: parseInt(data) });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
 export const abort = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ABORT;
-    const data = await baseService.base(req);
+    await baseService.base(req);
 
-    console.log(JSON.stringify(data));
-
-    // TODO
-    return res.status(200).send({ data: "" });
+    return res.status(200).send({ success: true });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
 export const cancel = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.CANCEL;
-    const data = await baseService.base(req);
+    await baseService.base(req);
 
-    console.log(JSON.stringify(data));
-
-    // TODO
-    return res.status(200).send({ data: "" });
+    return res.status(200).send({ success: true });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
 export const complete = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.COMPLETE;
-    const data = await baseService.base(req);
+    await baseService.base(req);
 
-    console.log(JSON.stringify(data));
-
-    // TODO
-    return res.status(200).send({ data: "" });
+    return res.status(200).send({ success: true });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -165,9 +157,9 @@ export const finalResults = async (req: any, res: any) => {
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -181,9 +173,9 @@ export const intermediateResults = async (req: any, res: any) => {
     // TODO
     return res.status(200).send({ data: "" });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -194,8 +186,8 @@ export const launcher = async (req: any, res: any) => {
 
     return res.status(200).send({ data: data.canceller });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };

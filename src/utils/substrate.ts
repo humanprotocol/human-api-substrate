@@ -93,7 +93,10 @@ export function sendAndWait(
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { documentation, name, section } = decoded;
 
-            reject(Error(`${section}.${name}: ${documentation.join(" ")}`));
+            const err = Error(`${section}.${name}: ${documentation.join(" ")}`);
+
+            err.name = name;
+            reject(err);
           } else {
             reject(Error(dispatchError.toString()));
           }

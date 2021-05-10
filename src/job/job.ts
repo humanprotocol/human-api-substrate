@@ -67,9 +67,12 @@ export default class Job extends JobReads {
     const escrow = await job.escrow();
 
     await job.fundEscrow(escrow.account, formattedAmount).catch((e) => {
-      throw new Error(
+      const err = new Error(
         `Escrow ${job.escrowId} created but not funded: '${e.message}'`
       );
+
+      err.name = e.name;
+      throw err;
     });
 
     return job;
@@ -108,8 +111,6 @@ export default class Job extends JobReads {
     const record = await sendAndWaitFor(api, call, sender, {
       section: "escrow",
       name: "Pending",
-    }).catch((e) => {
-      throw new Error(e.message);
     });
     const id: EscrowId = api.createType("EscrowId", record.event.data[0]);
 
@@ -146,9 +147,7 @@ export default class Job extends JobReads {
       handlers
     );
 
-    await sendAndWait(this.api, call, this.sender).catch((e) => {
-      throw new Error(e.message);
-    });
+    await sendAndWait(this.api, call, this.sender);
   }
 
   /**
@@ -165,8 +164,6 @@ export default class Job extends JobReads {
     await sendAndWaitFor(this.api, call, this.sender, {
       section: "escrow",
       name: "BulkPayout",
-    }).catch((e) => {
-      throw new Error(e.message);
     });
   }
 
@@ -185,9 +182,12 @@ export default class Job extends JobReads {
     );
 
     await sendAndWait(this.api, call, this.sender).catch((e) => {
-      throw new Error(
+      const err = new Error(
         `Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`
       );
+
+      err.name = e.name;
+      throw err;
     });
   }
 
@@ -199,9 +199,7 @@ export default class Job extends JobReads {
       this.escrowId
     );
 
-    await sendAndWait(this.api, call, this.sender).catch((e) => {
-      throw new Error(e.message);
-    });
+    await sendAndWait(this.api, call, this.sender);
   }
 
   /**
@@ -215,8 +213,6 @@ export default class Job extends JobReads {
     await sendAndWaitFor(this.api, call, this.sender, {
       section: "balances",
       name: "Transfer",
-    }).catch((e) => {
-      throw new Error(e.message);
     });
   }
 
@@ -237,9 +233,12 @@ export default class Job extends JobReads {
       section: "escrow",
       name: "IntermediateResults",
     }).catch((e) => {
-      throw new Error(
+      const err = new Error(
         `Results stored at ${resultInfo.url}, but failed to post on blockchain: '${e.message}'`
       );
+
+      err.name = e.name;
+      throw err;
     });
 
     this.storedIntermediateResults.push({
@@ -256,8 +255,6 @@ export default class Job extends JobReads {
       this.escrowId
     );
 
-    await sendAndWait(this.api, call, this.sender).catch((e) => {
-      throw new Error(e.message);
-    });
+    await sendAndWait(this.api, call, this.sender);
   }
 }

@@ -1,4 +1,5 @@
 import * as constants from "../config/constants";
+import { APIError, handleError } from "../middleware/errorHandler";
 import * as baseService from "../services/base.service";
 
 export const create = (req: any, res: any) => {
@@ -6,9 +7,9 @@ export const create = (req: any, res: any) => {
     // TODO: Check if address should be replaced with polling_url.
     return res.status(200).send({ address: 0 });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
 
@@ -19,8 +20,8 @@ export const get = async (req: any, res: any) => {
 
     return res.status(200).send({ jobs: data });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };

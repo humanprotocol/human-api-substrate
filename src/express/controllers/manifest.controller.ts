@@ -1,4 +1,5 @@
 import * as constants from "../config/constants";
+import { APIError, handleError } from "../middleware/errorHandler";
 import * as baseService from "../services/base.service";
 
 export const validate = async (req: any, res: any) => {
@@ -8,8 +9,8 @@ export const validate = async (req: any, res: any) => {
 
     return res.status(200).send({ data });
   } catch (e) {
-    console.log(e.message);
+    const error: APIError = handleError(e);
 
-    return res.status(500).send(e.message);
+    return res.status(error.status).send(error.err);
   }
 };
