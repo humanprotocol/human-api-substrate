@@ -54,13 +54,18 @@ const createFactory = async (body: any): Promise<any> => {
 
 const launchSchema = yup.object().shape({
   manifest: yup.object().required(),
-  factoryId: yup.number().required()
+  factoryId: yup.number().required(),
 });
 
 const launch = async (body: any): Promise<any> => {
   await launchSchema.validate(body);
   const { manifest } = body;
-  const job = await Job.launch(global.substrate, body.sender, manifest, body.factoryId);
+  const job = await Job.launch(
+    global.substrate,
+    body.sender,
+    manifest,
+    body.factoryId
+  );
 
   return { escrowId: job.escrowId };
 };
@@ -225,7 +230,7 @@ const manifest = async (body: any) => {
 };
 
 const getAllJobsSchema = yup.object().shape({
-  factoryId: yup.number().required()
+  factoryId: yup.number().required(),
 });
 
 const getAllJobs = async (body: any) => {
