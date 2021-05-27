@@ -1,10 +1,10 @@
 # Express wrapper
 
-- The express wrapper is meant to be a temporary wrapper that can except json objects and interact with the chain
+- The express wrapper is meant to be a temporary wrapper that can accept json objects and interact with the chain.
 
 ### Running
 
-- make sure to have a chain running at port 9944 (docker-compose up will start a chain for you if not running)
+- Make sure to have the HPF Substrate chain running at port 9944 (docker-compose up will start a chain for you if not running)
 - `yarn`
 - `yarn start` (use yarn express for dev mode)
 
@@ -14,7 +14,7 @@
 
 ### Usage
 
-- There is one endpoint and it takes a function name plus desired parameters in a post call.
+- The API is designed as per the HPF Swagger Spec available at [https://app.swaggerhub.com/apis/excerebrose/human-protocol/1.0.0#/](https://app.swaggerhub.com/apis/excerebrose/human-protocol/1.0.0#/).
 
 ### examples
 
@@ -22,7 +22,6 @@
 
 ```javascript
 const returned = await axios.post(url, {
-  functionName: "launch",
   seed: "//Alice",
   manifest,
 });
@@ -32,7 +31,6 @@ const returned = await axios.post(url, {
 
 ```javascript
 const returnedBalance = await axios.post(url, {
-  functionName: "balance",
   escrowId,
 });
 ```

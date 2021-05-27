@@ -30,6 +30,9 @@ export interface EscrowStatus extends Enum {
   readonly isCancelled: boolean;
 }
 
+/** @name FactoryId */
+export interface FactoryId extends u128 {}
+
 /** @name Moment */
 export interface Moment extends u64 {}
 

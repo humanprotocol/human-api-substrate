@@ -38,20 +38,29 @@ export const base = async (req: any): Promise<any> => {
     case constants.FINAL_RESULTS:
       return await readNoParams(req.body);
     case constants.ALL_JOBS:
-      return await getAllJobs();
+      return await getAllJobs(req.body);
+    case constants.CREATE_FACTORY:
+      return await createFactory(req.body);
     default:
       throw new Error("Invalid function name.");
   }
 };
 
+const createFactory = async (body: any): Promise<any> => {
+  const factoryId = await Job.createFactory(global.substrate, body.sender);
+
+  return { factoryId };
+};
+
 const launchSchema = yup.object().shape({
   manifest: yup.object().required(),
+  factoryId: yup.number().required()
 });
 
 const launch = async (body: any): Promise<any> => {
   await launchSchema.validate(body);
   const { manifest } = body;
-  const job = await Job.launch(global.substrate, body.sender, manifest);
+  const job = await Job.launch(global.substrate, body.sender, manifest, body.factoryId);
 
   return { escrowId: job.escrowId };
 };
@@ -59,6 +68,7 @@ const launch = async (body: any): Promise<any> => {
 const createEscrowSchema = yup.object().shape({
   manifestHash: yup.string().required(),
   manifestUrl: yup.string().required(),
+  factoryId: yup.number().required(),
   recordingOracle: yup.string().required(),
   recordingOracleStake: yup.string().required(),
   reputationOracle: yup.string().required(),
@@ -68,6 +78,7 @@ const createEscrowSchema = yup.object().shape({
 const createEscrow = async (body: any): Promise<any> => {
   await createEscrowSchema.validate(body);
   const {
+    factoryId,
     manifestHash,
     manifestUrl,
     recordingOracle,
@@ -80,6 +91,7 @@ const createEscrow = async (body: any): Promise<any> => {
     body.sender,
     manifestUrl,
     manifestHash,
+    factoryId,
     reputationOracle,
     recordingOracle,
     reputationOracleStake,
@@ -212,8 +224,13 @@ const manifest = async (body: any) => {
   return await job.manifest(manifestUrl);
 };
 
-const getAllJobs = async () => {
+const getAllJobsSchema = yup.object().shape({
+  factoryId: yup.number().required()
+});
+
+const getAllJobs = async (body: any) => {
+  await getAllJobsSchema.validate(body);
   const job = new JobReads(global.substrate, 0);
 
-  return await job.getAllJobs();
+  return await job.getAllJobs(body.factoryId);
 };

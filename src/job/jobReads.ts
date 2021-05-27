@@ -111,8 +111,8 @@ export default class JobReads {
    *
    * @returns all active jobs
    */
-  public async getAllJobs(): Promise<any> {
-    const jobs = await this.api.query.escrow.escrowList();
+  public async getAllJobs(factoryId: number): Promise<any> {
+    const jobs = await this.api.query.escrow.escrowFactory(factoryId);
 
     return jobs;
   }

@@ -51,11 +51,13 @@ describe("job", async () => {
   });
 
   it(`create an escrow`, async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -72,7 +74,8 @@ describe("job", async () => {
   });
 
   it("launches a job", async () => {
-    const job = await Job.launch(api, alice, manifest);
+    const factoryId = await Job.createFactory(api, alice);
+    const job = await Job.launch(api, alice, manifest, factoryId);
     const escrow = await job.escrow();
     mockData.end_time = Number(escrow.end_time);
     mockData.account = escrow.account.toString();
@@ -89,11 +92,13 @@ describe("job", async () => {
   });
 
   it("funds and escrow", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -110,11 +115,13 @@ describe("job", async () => {
     );
   });
   it("aborts escrow", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -132,11 +139,13 @@ describe("job", async () => {
     }
   });
   it("cancel escrow", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -152,11 +161,13 @@ describe("job", async () => {
     assert.deepEqual(escrow.toJSON(), mockData, "escrow should be cancelled");
   });
   it("stores intermediate results then fetches them", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -172,11 +183,13 @@ describe("job", async () => {
     );
   });
   it("does a bulk payout no results and sets complete", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -230,11 +243,13 @@ describe("job", async () => {
     );
   });
   it("does a bulk payout load test", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -259,11 +274,13 @@ describe("job", async () => {
     assert.deepEqual(escrow.toJSON(), mockData, "escrow should be paid");
   });
   it("does a bulk payout with results not full payout", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -324,11 +341,13 @@ describe("job", async () => {
   });
 
   it("adds trusted handlers", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
