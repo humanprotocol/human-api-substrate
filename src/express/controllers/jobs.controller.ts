@@ -69,6 +69,19 @@ export const status = async (req: any, res: any) => {
   }
 };
 
+export const escrow = async (req: any, res: any) => {
+  try {
+    req.body.functionName = constants.ESCROW;
+    const data = await baseService.base(req);
+
+    return res.status(200).send(data);
+  } catch (e) {
+    const error: APIError = handleError(e);
+
+    return res.status(error.status).send(error.err);
+  }
+};
+
 export const manifestUrl = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.ESCROW;
@@ -88,6 +101,32 @@ export const manifestHash = async (req: any, res: any) => {
     const data = await baseService.base(req);
 
     return res.status(200).send({ data: data.manifest_hash });
+  } catch (e) {
+    const error: APIError = handleError(e);
+
+    return res.status(error.status).send(error.err);
+  }
+};
+
+export const fundEscrow = async (req: any, res: any) => {
+  try {
+    req.body.functionName = constants.FUND_ESCROW;
+    await baseService.base(req);
+
+    return res.status(200).send({ success: true });
+  } catch (e) {
+    const error: APIError = handleError(e);
+
+    return res.status(error.status).send(error.err);
+  }
+};
+
+export const storeFinalResults = async (req: any, res: any) => {
+  try {
+    req.body.functionName = constants.STORE_FINAL_RESULTS;
+    await baseService.base(req);
+
+    return res.status(200).send({ success: true });
   } catch (e) {
     const error: APIError = handleError(e);
 
@@ -166,6 +205,22 @@ export const finalResults = async (req: any, res: any) => {
 export const intermediateResults = async (req: any, res: any) => {
   try {
     req.body.functionName = constants.FINAL_RESULTS;
+    const data = await baseService.base(req);
+
+    console.log(JSON.stringify(data));
+
+    // TODO
+    return res.status(200).send({ data: "" });
+  } catch (e) {
+    const error: APIError = handleError(e);
+
+    return res.status(error.status).send(error.err);
+  }
+};
+
+export const noteIntermediateResults = async (req: any, res: any) => {
+  try {
+    req.body.functionName = constants.NOTE_INTERMEDIATE_RESULTS;
     const data = await baseService.base(req);
 
     console.log(JSON.stringify(data));

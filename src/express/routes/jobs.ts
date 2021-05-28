@@ -16,6 +16,8 @@ router.post("/bulkPayout", jobsController.bulkPayout);
 
 router.post("/addTrustedHandlers", jobsController.addTrustedHandlers);
 
+router.get("/escrow", jobsController.escrow);
+
 router.get("/status", jobsController.status);
 
 router.get("/manifestUrl", jobsController.manifestUrl);
@@ -24,15 +26,24 @@ router.get("/manifestHash", jobsController.manifestHash);
 
 router.get("/balance", jobsController.balance);
 
-router.post("/abort", jobsController.abort);
+router.patch("/abort", jobsController.abort);
 
-router.post("/cancel", jobsController.cancel);
+router.patch("/cancel", jobsController.cancel);
 
-router.post("/complete", jobsController.complete);
+router.patch("/fund", jobsController.fundEscrow);
 
-router.get("/intermediateResults", jobsController.balance);
+router.patch("/storeFinalResults", jobsController.storeFinalResults);
 
-router.get("/finalResults", jobsController.balance);
+router.patch("/complete", jobsController.complete);
+
+router.patch(
+  "/noteIntermediateResults",
+  jobsController.noteIntermediateResults
+);
+
+router.get("/intermediateResults", jobsController.intermediateResults);
+
+router.get("/finalResults", jobsController.finalResults);
 
 router.get("/launcher", jobsController.launcher);
 

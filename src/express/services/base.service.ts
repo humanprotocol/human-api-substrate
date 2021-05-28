@@ -28,15 +28,15 @@ export const base = async (req: any): Promise<any> => {
     case constants.COMPLETE:
       return await writeNoParams(req.body);
     case constants.ESCROW:
-      return await readNoParams(req.body);
+      return await readNoParams({ ...req.body, ...req.query });
     case constants.IS_TRUSTED_HANDLER:
       return await isTrustedHandler(req.body);
     case constants.BALANCE:
-      return await readNoParams(req.body);
+      return await readNoParams({ ...req.body, ...req.query });
     case constants.MANIFEST:
-      return await manifest(req.body);
+      return await manifest(req.query);
     case constants.FINAL_RESULTS:
-      return await readNoParams(req.body);
+      return await readNoParams({ ...req.body, ...req.query });
     case constants.ALL_JOBS:
       return await getAllJobs(req.body);
     case constants.CREATE_FACTORY:
@@ -58,6 +58,7 @@ const launchSchema = yup.object().shape({
 });
 
 const launch = async (body: any): Promise<any> => {
+  console.log({ body });
   await launchSchema.validate(body);
   const { manifest } = body;
   const job = await Job.launch(
@@ -190,7 +191,6 @@ const noteIntermediateResults = async (body: any) => {
 
 const readNoParamsSchema = yup.object().shape({
   escrowId: yup.string().required(),
-  functionName: yup.string().required(),
 });
 
 const readNoParams = async (body: any) => {

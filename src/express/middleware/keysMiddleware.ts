@@ -12,7 +12,6 @@ export default function keysMiddleware(
 ) {
   const body = request.body;
   let sender = null;
-
   if (
     body.hasOwnProperty("gasPayer") &&
     body.hasOwnProperty("gasPayerPrivate") &&
@@ -28,6 +27,7 @@ export default function keysMiddleware(
     sender = global.keyring.addPair(pair);
   } else if (body.hasOwnProperty("seed")) {
     sender = global.keyring.addFromUri(body.seed);
+  } else if (request.method === "GET") {
   } else {
     response.status(400).send({
       error: "Invalid parameter.",
