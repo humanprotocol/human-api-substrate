@@ -4,7 +4,7 @@ import { ApiPromise } from "@polkadot/api";
 import { AccountId, Balance } from "@polkadot/types/interfaces";
 
 import { download } from "../storage";
-import { EscrowId, EscrowInfo, PrivateKey } from "../types";
+import { EscrowId, EscrowInfo, PrivateKey, FactoryId } from "../types";
 
 export default class JobReads {
   api: ApiPromise;
@@ -111,7 +111,7 @@ export default class JobReads {
    *
    * @returns all active jobs
    */
-  public async getAllJobs(factoryId: number): Promise<any> {
+  public async getAllJobs(factoryId: FactoryId): Promise<any> {
     const jobs = await this.api.query.escrow.escrowFactory(factoryId);
 
     return jobs;
