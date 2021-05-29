@@ -36,9 +36,6 @@ the [keyring](https://polkadot.js.org/docs/keyring).
 	// return the api and keyring from setup will return the default local host connection to api
 	const {api, keyring} = await setup();
 
-	// connection to non default endpoint
-	//const {api, keyring} = await setup("wss://rpc.polkadot.io");
-
 	// keyring pair object
 	const keyringPair = keyring.addFromUri(<Secret>);
 ```
@@ -80,12 +77,14 @@ const reputationOracleAddress =
 const reputationOracleAddress = recordingOracleAddress;
 const reputationOracleStake = 5;
 const recordingOracleStake = reputationOracleStake;
+const factoryId = 0;
 
 const job = await Job.createEscrow(
   api,
   keyringPair,
   manifestUrl,
   manifestHash,
+  factoryId,
   reputationOracleAddress,
   recordingOracleAddress,
   reputationOracleStake,
@@ -106,7 +105,7 @@ const manifest = {
   job_mode: "batch",
   // -- snip --
 };
-const job = await Job.launch(api, keyringPair, manifest);
+const job = await Job.launch(api, keyringPair, manifest, factoryId);
 ```
 
 ## Interacting with a Job

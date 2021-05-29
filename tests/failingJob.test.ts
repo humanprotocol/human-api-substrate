@@ -85,6 +85,7 @@ describe("failing job", async () => {
   // });
 
   it("fails launch on funding escrow", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     manifest.task_bid_price = "10";
     const call = api.tx.balances.transfer(dave.address, "100000000000000");
     await sendAndWaitFor(api, call, alice, {
@@ -95,7 +96,7 @@ describe("failing job", async () => {
     });
     const currentEscrow = await api.query.escrow.counter();
     try {
-      await Job.launch(api, dave, manifest);
+      await Job.launch(api, dave, manifest, factoryId);
       should.fail("no error was thrown when it should have been", "");
     } catch (e) {
       assert.equal(
@@ -106,11 +107,13 @@ describe("failing job", async () => {
     manifest.task_bid_price = "0.000064";
   });
   it("fails to add trusted handler", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -154,11 +157,13 @@ describe("failing job", async () => {
   //   }
   // });
   it("fails to bulk payout", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -181,11 +186,13 @@ describe("failing job", async () => {
     }
   });
   it("fails to store final results", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -206,11 +213,13 @@ describe("failing job", async () => {
     }
   });
   it("fails to abort", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -233,11 +242,13 @@ describe("failing job", async () => {
     }
   });
   it("fails to cancel", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -260,11 +271,13 @@ describe("failing job", async () => {
     }
   });
   it("fails to store intermediate results", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),
@@ -285,11 +298,13 @@ describe("failing job", async () => {
     }
   });
   it("fails to complete", async () => {
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       manifest.reputation_oracle_addr,
       manifest.recording_oracle_addr,
       new BN("5"),

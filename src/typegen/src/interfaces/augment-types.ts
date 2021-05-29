@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 import type { BitVec, Bool, Bytes, Compact, Data, DoNotConstruct, I128, I16, I256, I32, I64, I8, Json, Null, Option, Raw, StorageKey, Text, Type, U128, U16, U256, U32, U64, U8, USize, Vec, bool, i128, i16, i256, i32, i64, i8, u128, u16, u256, u32, u64, u8, usize } from '@polkadot/types';
-import type { EscrowId, EscrowInfo, EscrowStatus, ResultInfo } from './escrow';
+import type { EscrowId, EscrowInfo, EscrowStatus, FactoryId, ResultInfo } from './escrow';
 import type { AssetBalance, AssetDetails, TAssetBalance, TAssetDepositBalance } from '@polkadot/types/interfaces/assets';
 import type { BlockAttestations, IncludedBlocks, MoreAttestations } from '@polkadot/types/interfaces/attestations';
 import type { RawAuraPreDigest } from '@polkadot/types/interfaces/aura';
@@ -1889,6 +1889,10 @@ declare module '@polkadot/types/types/registry' {
     'Compact<EscrowId>': Compact<EscrowId>;
     'Option<EscrowId>': Option<EscrowId>;
     'Vec<EscrowId>': Vec<EscrowId>;
+    FactoryId: FactoryId;
+    'Compact<FactoryId>': Compact<FactoryId>;
+    'Option<FactoryId>': Option<FactoryId>;
+    'Vec<FactoryId>': Vec<FactoryId>;
     EscrowStatus: EscrowStatus;
     'Option<EscrowStatus>': Option<EscrowStatus>;
     'Vec<EscrowStatus>': Vec<EscrowStatus>;

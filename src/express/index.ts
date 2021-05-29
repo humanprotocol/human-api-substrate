@@ -1,10 +1,11 @@
-import bodyParser from "body-parser";
+import { json } from "body-parser";
 import cors from "cors";
 import express from "express";
 import logger from "morgan";
 
 import { setup } from "../index";
-import { endpoint } from "./config/config";
+import { endpoint } from "./config/constants";
+import keysMiddleware from "./middleware/keysMiddleware";
 import routes from "./routes";
 
 const port = "3001";
@@ -16,13 +17,17 @@ if (process.env.NODE === "development") {
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.json({ limit: "500mb" }));
+app.use(json({ limit: "5mb" }));
 
 app.use((req: any, res: any, next: any) => {
   next();
 });
 
-app.use("/", routes.base);
+app.use(keysMiddleware);
+
+app.use("/factory", routes.factory);
+app.use("/manifest", routes.manifest);
+app.use("/job", routes.jobs);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -34,8 +39,9 @@ declare global {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.listen(port, async () => {
-  console.log(`Api listening on port ${port}!`);
+  console.log(`API listening on port ${port}!`);
   const returned: any = await setup(endpoint);
 
   global.substrate = returned.api;

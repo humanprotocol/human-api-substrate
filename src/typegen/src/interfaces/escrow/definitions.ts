@@ -3,6 +3,7 @@
 export default {
   types: {
     EscrowId: "u128",
+    FactoryId: "u128",
     Moment: "u64",
     EscrowStatus: {
       _enum: ["Pending", "Partial", "Paid", "Complete", "Cancelled"],

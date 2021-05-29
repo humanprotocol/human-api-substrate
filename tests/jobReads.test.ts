@@ -24,11 +24,13 @@ describe("Job reads", async () => {
     const charlie = keyring.addFromUri("//Charlie");
     const manifestUrl = "some.url";
     const manifestHash = "0xdev";
+    const factoryId = await Job.createFactory(api, alice);
     const job = await Job.createEscrow(
       api,
       alice,
       manifestUrl,
       manifestHash,
+      factoryId,
       bob.address,
       charlie.address,
       new BN(10),

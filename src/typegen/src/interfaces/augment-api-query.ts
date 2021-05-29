@@ -3,7 +3,7 @@
 
 import type { Bytes, Option, Vec, bool, u32 } from '@polkadot/types';
 import type { AnyNumber, ITuple, Observable } from '@polkadot/types/types';
-import type { EscrowId, EscrowInfo, ResultInfo } from './escrow';
+import type { EscrowId, EscrowInfo, FactoryId, ResultInfo } from './escrow';
 import type { AccountData, BalanceLock } from '@polkadot/types/interfaces/balances';
 import type { SetId, StoredPendingChange, StoredState } from '@polkadot/types/interfaces/grandpa';
 import type { AccountId, Balance, BlockNumber, ExtrinsicsWeight, Hash, Moment, Releases } from '@polkadot/types/interfaces/runtime';
@@ -43,13 +43,25 @@ declare module '@polkadot/api/types/storage' {
        **/
       counter: AugmentedQuery<ApiType, () => Observable<EscrowId>>;
       /**
+       * List of all currently active jobs.
+       **/
+      escrowFactory: AugmentedQuery<ApiType, (arg: FactoryId | AnyNumber | Uint8Array) => Observable<Vec<EscrowId>>>;
+      /**
        * Escrow storage. Stores configuration and state for an escorw.
        **/
       escrows: AugmentedQuery<ApiType, (arg: EscrowId | AnyNumber | Uint8Array) => Observable<Option<EscrowInfo>>>;
       /**
+       * Used to determine the next factory id for a new factory.
+       **/
+      factoryCounter: AugmentedQuery<ApiType, () => Observable<FactoryId>>;
+      /**
        * Results storage for each escrow.
        **/
       finalResults: AugmentedQuery<ApiType, (arg: EscrowId | AnyNumber | Uint8Array) => Observable<Option<ResultInfo>>>;
+      /**
+       * The number of trusted handlers associated with an escrow.
+       **/
+      handlersCount: AugmentedQuery<ApiType, (arg: EscrowId | AnyNumber | Uint8Array) => Observable<u32>>;
       /**
        * The privileged accounts associated with an escrow.
        **/

@@ -1,7 +1,7 @@
 // Auto-generated via `yarn polkadot-types-from-chain`, do not edit
 /* eslint-disable */
 
-import type { Bytes, Compact, Option, Vec, u32, u64 } from '@polkadot/types';
+import type { Bytes, Compact, Option, Vec, u128, u32, u64 } from '@polkadot/types';
 import type { AnyNumber } from '@polkadot/types/types';
 import type { EscrowId } from './escrow';
 import type { Extrinsic } from '@polkadot/types/interfaces/extrinsics';
@@ -106,7 +106,7 @@ declare module '@polkadot/api/types/submittable' {
       /**
        * Pay out `recipients` with `amounts`. Calculates and transfer oracle fees.
        * 
-       * Sets the escrow to `Complete` if all balance is spent, otherwise to `Partial`.
+       * Sets the escrow to `Paid` if all balance is spent, otherwise to `Partial`.
        * Requires trusted handler privileges.
        **/
       bulkPayout: AugmentedSubmittable<(id: EscrowId | AnyNumber | Uint8Array, recipients: Vec<AccountId> | (AccountId | string | Uint8Array)[], amounts: Vec<BalanceOf> | (BalanceOf | AnyNumber | Uint8Array)[]) => SubmittableExtrinsic<ApiType>>;
@@ -130,7 +130,11 @@ declare module '@polkadot/api/types/submittable' {
        * Sender is set as canceller of the escrow.
        * Emits the escrow id with the `Pending` event.
        **/
-      create: AugmentedSubmittable<(manifestUrl: Bytes | string | Uint8Array, manifestHash: Bytes | string | Uint8Array, reputationOracle: AccountId | string | Uint8Array, recordingOracle: AccountId | string | Uint8Array, reputationOracleStake: Percent | AnyNumber | Uint8Array, recordingOracleStake: Percent | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      create: AugmentedSubmittable<(manifestUrl: Bytes | string | Uint8Array, manifestHash: Bytes | string | Uint8Array, factoryId: u128 | AnyNumber | Uint8Array, reputationOracle: AccountId | string | Uint8Array, recordingOracle: AccountId | string | Uint8Array, reputationOracleStake: Percent | AnyNumber | Uint8Array, recordingOracleStake: Percent | AnyNumber | Uint8Array) => SubmittableExtrinsic<ApiType>>;
+      /**
+       * Create a new factory.
+       **/
+      createFactory: AugmentedSubmittable<() => SubmittableExtrinsic<ApiType>>;
       /**
        * Note intermediate results by emitting the `IntermediateResults` event.
        * 
