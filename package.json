@@ -49,7 +49,7 @@
     "@polkadot/keyring": "^4.2.1",
     "@polkadot/types": "^2.10.1",
     "aws-sdk": "^2.799.0",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
