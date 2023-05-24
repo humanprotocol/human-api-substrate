@@ -48,7 +48,7 @@
     "@polkadot/api": "^2.10.1",
     "@polkadot/keyring": "^4.2.1",
     "@polkadot/types": "^2.10.1",
-    "aws-sdk": "^2.799.0",
+    "aws-sdk": "^2.1370.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
